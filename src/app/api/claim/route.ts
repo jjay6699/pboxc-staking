@@ -3,7 +3,10 @@ import { z } from "zod";
 import { db } from "@/server/db";
 import { getAccruedPboxc, isClaimable } from "@/lib/rewards";
 
-const BodySchema = z.object({ id: z.string().min(8) });
+const BodySchema = z.object({
+  id: z.string().min(8),
+  wallet_address: z.string().min(32),
+});
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
@@ -11,9 +14,13 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
-  const { id } = parsed.data;
+  const { id, wallet_address } = parsed.data;
   const p = db.getPositionById(id);
   if (!p) return NextResponse.json({ error: "not_found" }, { status: 404 });
+
+  if (p.wallet_address !== wallet_address) {
+    return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  }
 
   const claimable = isClaimable(p.start_ts, p.lock_plan);
   if (!claimable) {

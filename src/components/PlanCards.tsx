@@ -11,7 +11,7 @@ export default function PlanCards({ onSelect }: { onSelect: (plan: LockPlan) => 
         const daily = 1 * BASE_RATE * mult; // 1 SOL baseline
         return (
           <button key={plan} onClick={() => onSelect(plan)} className={cn(
-            "rounded-2xl text-left p-5 bg-white/[0.03] border border-white/[0.08] hover:bg-white/[0.05] transition duration-200",
+            "rounded-2xl text-left p-5 bg-white/[0.03] border border-white/[0.08] transition duration-200 card-neo",
             "shadow-sm"
           )}>
             <div className="flex items-center justify-between">

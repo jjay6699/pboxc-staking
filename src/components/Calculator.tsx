@@ -13,7 +13,7 @@ export default function Calculator() {
   const total = useMemo(() => daily * days, [daily, days]);
 
   return (
-    <div className="rounded-2xl bg-white/[0.03] border border-white/[0.08] p-5">
+    <div className="rounded-2xl bg-white/[0.03] border border-white/[0.08] p-5 card-neo">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="space-y-2">
           <label className="text-sm text-white/70">Amount (SOL)</label>

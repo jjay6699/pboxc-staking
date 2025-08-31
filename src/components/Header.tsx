@@ -13,10 +13,10 @@ export default function Header() {
         </div>
         {/* Right: Nav */}
         <nav className="flex items-center gap-6 text-sm">
-          <a className="text-white/70 hover:text-white transition-colors" href="#plans">Plans</a>
-          <a className="text-white/70 hover:text-white transition-colors" href="#calculator">Calculator</a>
-          <a className="text-white/70 hover:text-white transition-colors" href="#dashboard">Dashboard</a>
-          <a className="text-white/70 hover:text-white transition-colors" href="#stats">Stats</a>
+          <a className="link-neo" href="#plans">Plans</a>
+          <a className="link-neo" href="#calculator">Calculator</a>
+          <a className="link-neo" href="#dashboard">Dashboard</a>
+          <a className="link-neo" href="#stats">Stats</a>
         </nav>
         </div>
       </div>

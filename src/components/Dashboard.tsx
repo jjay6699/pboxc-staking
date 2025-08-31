@@ -42,7 +42,7 @@ export default function Dashboard({ wallet }: { wallet: string | null }) {
         const dailyPboxc = Math.floor(p.amount_sol * BASE_RATE * p.lock_multiplier);
 
         return (
-          <div key={p.id} className="rounded-2xl bg-white/[0.03] border border-white/[0.08] p-4">
+          <div key={p.id} className="rounded-2xl bg-white/[0.03] border border-white/[0.08] p-4 card-neo">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-2">
                 <span className="text-sm text-white/70">{getPlanLabel(p.lock_plan as any)}</span>

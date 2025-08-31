@@ -30,7 +30,7 @@ export default function WalletPanel() {
 	};
 
 	return (
-		<div className="w-full rounded-2xl bg-white/[0.02] border border-white/[0.08] shadow-xl backdrop-blur-sm p-6 sm:p-8">
+		<div className="w-full rounded-2xl bg-white/[0.02] border border-white/[0.08] shadow-xl backdrop-blur-sm p-6 sm:p-8 card-neo">
 			{/* Header */}
 			<div className="flex items-center justify-between gap-4">
 				<div>
