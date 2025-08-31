@@ -8,7 +8,7 @@ export default function Header() {
       <div className="max-w-[1200px] mx-auto px-6 sm:px-8 h-16 flex items-center justify-between border-b border-white/10">
         {/* Left: Logo */}
         <div className="flex items-center">
-          <Image src="/logo-header.png" width={92} height={20} alt="PBOXC" priority />
+          <Image src="/logo-header.png" width={160} height={32} alt="PBOXC" priority />
         </div>
         {/* Right: Nav */}
         <nav className="flex items-center gap-6 text-sm">
