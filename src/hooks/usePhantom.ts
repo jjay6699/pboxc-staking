@@ -10,6 +10,7 @@ export function usePhantom() {
   const [connecting, setConnecting] = useState(false);
   const [lastError, setLastError] = useState<string | null>(null);
   const [cluster] = useState<string>(DEFAULT_CLUSTER);
+  const [balanceSol, setBalanceSol] = useState<number | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -31,6 +32,25 @@ export function usePhantom() {
     });
     return () => { mounted = false; };
   }, []);
+
+  // Fetch balance when address/cluster changes
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      if (!address) { setBalanceSol(null); return; }
+      try {
+        const { Connection, PublicKey, clusterApiUrl } = await import("@solana/web3.js");
+        const endpoint = cluster === "mainnet" ? clusterApiUrl("mainnet-beta") : clusterApiUrl("devnet");
+        const conn = new Connection(endpoint, "confirmed");
+        const lamports = await conn.getBalance(new PublicKey(address));
+        if (!cancelled) setBalanceSol(lamports / 1_000_000_000);
+      } catch {
+        if (!cancelled) setBalanceSol(null);
+      }
+    }
+    load();
+    return () => { cancelled = true; };
+  }, [address, cluster]);
 
   const networkLabel = useMemo(() => getNetworkLabel(cluster), [cluster]);
   const isConnected = !!address;
@@ -63,5 +83,5 @@ export function usePhantom() {
     }
   }, [provider]);
 
-  return { provider, address, networkLabel, connecting, connect, disconnect, lastError, isConnected };
+  return { provider, address, networkLabel, connecting, connect, disconnect, lastError, isConnected, balanceSol };
 } 
