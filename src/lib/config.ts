@@ -24,6 +24,20 @@ export const STAKING_PAUSED = false;
 
 export const DEFAULT_CLUSTER = process.env.NEXT_PUBLIC_SOLANA_CLUSTER ?? "devnet";
 
+// Back-compat alias used across the app
+export const CONTRACT_ADDRESS = DEPOSIT_ADDRESS;
+
+export function getPlanLabel(plan: LockPlan): string {
+	switch (plan) {
+		case "1w": return "1 Week";
+		case "1m": return "1 Month";
+		case "3m": return "3 Months";
+		case "6m": return "6 Months";
+		case "12m": return "12 Months";
+		default: return plan as string;
+	}
+}
+
 export function getNetworkLabel(cluster: string): "Mainnet" | "Devnet" {
 	return cluster === "mainnet" || cluster === "mainnet-beta" ? "Mainnet" : "Devnet";
 } 

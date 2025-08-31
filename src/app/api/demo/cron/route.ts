@@ -12,3 +12,4 @@ export function getDemoNow(): number {
   return Math.floor(Date.now() / 1000) + demoDaysOffset * 86400;
 }
 
+
