@@ -75,7 +75,7 @@ export default function Home() {
         open={open}
         plan={selectedPlan}
         onClose={() => setOpen(false)}
-        onStake={(amt) => handleStake(amt)}
+        onStake={(amt: number) => handleStake(amt)}
       />
 
       <section id="dashboard">
