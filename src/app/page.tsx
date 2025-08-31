@@ -1,103 +1,93 @@
-import Image from "next/image";
+"use client";
+
+import WalletPanel from "@/components/WalletPanel";
+import PlanCards from "@/components/PlanCards";
+import StakeModal from "@/components/StakeModal";
+import Dashboard from "@/components/Dashboard";
+import GlobalStats from "@/components/GlobalStats";
+import StickySummary from "@/components/StickySummary";
+import Calculator from "@/components/Calculator";
+import Steps from "@/components/Steps";
+import SectionIntro from "@/components/SectionIntro";
+import { usePhantom } from "@/hooks/usePhantom";
+import { LockPlan, CONTRACT_ADDRESS, DEFAULT_CLUSTER } from "@/lib/config";
+import { sendSolViaPhantom } from "@/lib/phantom";
+import { useState } from "react";
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const { address, provider, connect, isConnected } = usePhantom() as any;
+  const [selectedPlan, setSelectedPlan] = useState<LockPlan | null>(null);
+  const [open, setOpen] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+  const handleStake = async (amount: number) => {
+    try {
+      const amt = Number(amount);
+      if (!amt || amt <= 0) {
+        alert("Please enter a valid SOL amount.");
+        return;
+      }
+      if (!provider) {
+        await connect?.();
+      }
+      const p = (provider ?? (window as any).solana);
+      if (!p) {
+        alert("Phantom is not available.");
+        return;
+      }
+      await sendSolViaPhantom({ provider: p, recipient: CONTRACT_ADDRESS, amountSol: amt, cluster: DEFAULT_CLUSTER });
+      setOpen(false);
+    } catch (e: any) {
+      if (/User rejected/i.test(e?.message)) return; // silent cancel
+      console.error("Stake error", e);
+      alert(e?.message || "Failed to open Phantom");
+    }
+  };
+
+  return (
+    <div className="space-y-10">
+      <section>
+        <header className="pb-8">
+          <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight">PBOXC Staking</h1>
+          <p className="text-white/70 text-base mt-3 leading-relaxed">Stake SOL into time-locked plans to earn daily PBOXC rewards. Rewards accrue linearly each day at a base rate of 100 PBOXC per SOL and are boosted by the selected lock multiplier. Funds remain locked until maturity, at which point you can claim or restake.</p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <a href="#plans" className="px-4 py-2 rounded-xl bg-white text-black text-sm font-medium">View Plans</a>
+            <a href="#dashboard" className="px-4 py-2 rounded-xl border border-white/15 text-sm text-white/80 hover:text-white">Your Dashboard</a>
+          </div>
+          <div className="mt-8 border-t border-white/10" />
+        </header>
+        <Steps />
+        <div className="mt-6" />
+        <SectionIntro className="mt-6 mb-4" title="1) Connect your wallet" subtitle="Connect Phantom and review the contract address for deposits." />
+        <WalletPanel />
+      </section>
+
+      <section id="calculator">
+        <SectionIntro className="mt-6 mb-4" title="2) Estimate your rewards" subtitle="Use the calculator to preview daily and total PBOXC based on amount and lock plan." />
+        <Calculator />
+      </section>
+
+      <section id="plans">
+        <SectionIntro className="mt-6 mb-4" title="3) Choose a lock plan" subtitle="Pick a lock period. After selection, enter the SOL amount and confirm in Phantom." />
+        <PlanCards onSelect={(p) => { setSelectedPlan(p); setOpen(true); }} />
+      </section>
+
+      <StakeModal
+        open={open}
+        plan={selectedPlan}
+        onClose={() => setOpen(false)}
+        onStake={(amt) => handleStake(amt)}
+      />
+
+      <section id="dashboard">
+        <SectionIntro className="mt-6 mb-4" title="4) Track earnings and claim" subtitle="Your positions appear here with daily accrual, maturity countdown, and Claim/Restake actions." />
+        <Dashboard wallet={address} />
+      </section>
+
+      <section id="stats">
+        <GlobalStats />
+      </section>
+
+      <StickySummary address={address} />
     </div>
   );
 }
