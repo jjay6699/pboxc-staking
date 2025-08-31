@@ -66,7 +66,7 @@ export default function Dashboard({ wallet }: { wallet: string | null }) {
                   className="px-4 py-2 rounded-xl text-sm font-medium bg-white text-black disabled:opacity-50 h-[42px]"
                   disabled={claimDisabled}
                   onClick={async () => {
-                    const r = await apiPost<{ position: DerivedPosition; claimed: number }>("/api/claim", { id: p.id }).catch(() => null);
+                    const r = await apiPost<{ position: DerivedPosition; claimed: number }>("/api/claim", { id: p.id, wallet_address: wallet! }).catch(() => null);
                     if (r) {
                       setItems(items.map(x => (x.id === p.id ? { ...x, status: "claimed", claimed_pboxc: r.claimed } : x)));
                     }

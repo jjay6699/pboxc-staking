@@ -14,8 +14,54 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PBOXC Staking",
-  description: "Stake SOL to earn PBOXC",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://pboxc-staking.vercel.app"),
+  title: {
+    default: "PBOXC Staking",
+    template: "%s | PBOXC Staking",
+  },
+  description: "Stake SOL into time-locked plans to earn daily PBOXC rewards.",
+  keywords: [
+    "PBOXC",
+    "staking",
+    "Solana",
+    "SOL",
+    "Phantom",
+    "crypto",
+    "web3",
+    "DeFi",
+  ],
+  applicationName: "PBOXC Staking",
+  authors: [{ name: "PBOXC" }],
+  creator: "PBOXC",
+  publisher: "PBOXC",
+  robots: {
+    index: true,
+    follow: true,
+  },
+  openGraph: {
+    type: "website",
+    url: "/",
+    siteName: "PBOXC Staking",
+    title: "PBOXC Staking",
+    description: "Stake SOL into time-locked plans to earn daily PBOXC rewards.",
+    images: [
+      { url: "/logo-header.png", width: 1200, height: 630, alt: "PBOXC" },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PBOXC Staking",
+    description: "Stake SOL into time-locked plans to earn daily PBOXC rewards.",
+    images: ["/logo-header.png"],
+  },
+  icons: {
+    icon: [
+      { url: "/favicon.png", type: "image/png" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+  },
+  themeColor: "#0a0a0a",
 };
 
 export default function RootLayout({
