@@ -4,8 +4,10 @@ import { LOCK_MULTIPLIERS, LockPlan } from "@/lib/config";
 import { getAccruedPboxc, getDaysElapsed, getMaturityTs, isClaimable } from "@/lib/rewards";
 import type { DerivedPosition, Position, TxRecord } from "@/types";
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const DB_FILE = path.join(DATA_DIR, "storage.json");
+const shouldPersistToDisk = process.env.VERCEL !== "1" || process.env.ENABLE_FILE_DB === "true";
+const resolvedStorePath = process.env.DATA_STORE_PATH ?? "data/storage.json";
+const DB_FILE = shouldPersistToDisk ? path.resolve(process.cwd(), resolvedStorePath) : null;
+const DATA_DIR = DB_FILE ? path.dirname(DB_FILE) : null;
 
 type DbState = {
   positions: Position[];
@@ -56,6 +58,7 @@ function normalizeTx(raw: any): TxRecord | null {
 }
 
 function loadState(): DbState {
+  if (!DB_FILE) return { positions: [], txs: [] };
   if (!fs.existsSync(DB_FILE)) return { positions: [], txs: [] };
   try {
     const contents = fs.readFileSync(DB_FILE, "utf-8");
@@ -76,6 +79,7 @@ function loadState(): DbState {
 const state: DbState = loadState();
 
 function persist() {
+  if (!DB_FILE || !DATA_DIR) return;
   try {
     if (!fs.existsSync(DATA_DIR)) {
       fs.mkdirSync(DATA_DIR, { recursive: true });

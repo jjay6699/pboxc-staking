@@ -65,8 +65,8 @@ export async function verifyDepositSignature(args: {
   }
 
   const accountKeys = tx.transaction.message.accountKeys.map((account) => {
-    if ("pubkey" in account) return account.pubkey.toBase58();
-    return account.toBase58();
+    const key = "pubkey" in account ? account.pubkey : account;
+    return new PublicKey(key).toBase58();
   });
 
   const depositIndex = accountKeys.findIndex((k) => k === depositPublicKey.toBase58());
