@@ -13,7 +13,7 @@ const RPC_ENDPOINT =
   process.env.SOLANA_RPC_URL ??
   clusterApiUrl(resolveCluster(DEFAULT_CLUSTER));
 
-const connection = new Connection(RPC_ENDPOINT, DEFAULT_COMMITMENT, {
+const connection = new Connection(RPC_ENDPOINT, {
   commitment: DEFAULT_COMMITMENT,
 });
 
