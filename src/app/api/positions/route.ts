@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/server/db";
-import { LOCK_MULTIPLIERS, LockPlan } from "@/lib/config";
+import { LockPlan } from "@/lib/config";
+import { LAMPORTS_PER_SOL, lamportsToSol, verifyDepositSignature } from "@/server/verifyDeposit";
 
 const MAX_DEPOSIT_SOL = 1000;
 
@@ -12,6 +13,7 @@ const CreateSchema = z.object({
     .positive("amount must be > 0")
     .max(MAX_DEPOSIT_SOL, `amount must be <= ${MAX_DEPOSIT_SOL}`),
   lock_plan: z.custom<LockPlan>(),
+  tx_signature: z.string().min(32),
 });
 
 export async function GET(req: NextRequest) {
@@ -23,19 +25,55 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const demoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "true" || process.env.DEMO_MODE === "true";
-  const headerKey = req.headers.get("x-demo-key");
-  const requiredKey = process.env.DEMO_KEY;
-  if (!demoMode || (requiredKey && headerKey !== requiredKey)) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
-
   const json = await req.json().catch(() => null);
   const parsed = CreateSchema.safeParse(json);
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
-  const { wallet_address, amount_sol, lock_plan } = parsed.data;
-  const pos = db.createPosition({ wallet_address, amount_sol, lock_plan });
-  return NextResponse.json({ position: pos });
+  const { wallet_address, amount_sol, lock_plan, tx_signature } = parsed.data;
+
+  if (db.findPositionBySignature(tx_signature) || db.findTxBySignature(tx_signature)) {
+    return NextResponse.json({ error: "duplicate_signature" }, { status: 409 });
+  }
+
+  const expectedLamports = Math.round(amount_sol * LAMPORTS_PER_SOL);
+
+  let verified;
+  try {
+    verified = await verifyDepositSignature({
+      signature: tx_signature,
+      walletAddress: wallet_address,
+      expectedLamports,
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "verification_failed";
+    const status = msg === "transaction_not_found" ? 404 : 400;
+    return NextResponse.json({ error: msg }, { status });
+  }
+
+  const onChainAmountSol = lamportsToSol(verified.lamports);
+  const timestamp = verified.blockTime ?? Math.floor(Date.now() / 1000);
+
+  const pos = db.createPosition({
+    wallet_address,
+    amount_sol: onChainAmountSol,
+    lock_plan,
+    start_ts: timestamp,
+    tx_signature,
+  });
+
+  db.addTx({
+    wallet_address,
+    type: "deposit",
+    tx_sig: tx_signature,
+    ts: timestamp,
+    meta: {
+      amount_sol: onChainAmountSol,
+      lock_plan,
+      lamports: verified.lamports,
+      slot: verified.slot,
+    },
+  });
+
+  return NextResponse.json({ position: pos, verified_amount: onChainAmountSol, blockTime: timestamp });
 } 

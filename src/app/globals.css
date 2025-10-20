@@ -43,3 +43,18 @@ body {
     radial-gradient(800px circle at 50% 50%, rgba(167,139,250,.08), rgba(34,211,238,.03) 40%),
     rgba(255,255,255,.03);
 }
+
+.select-neo {
+  color: rgba(255,255,255,.9);
+  background-color: rgba(0,0,0,.3);
+  backdrop-filter: blur(12px);
+}
+.select-neo option {
+  background-color: rgba(12,12,12,.96);
+  color: rgba(255,255,255,.92);
+}
+.select-neo option:checked,
+.select-neo option:hover {
+  background-color: rgba(167,139,250,.35);
+  color: rgba(255,255,255,.95);
+}

@@ -32,7 +32,7 @@ export default function Calculator() {
           <select
             value={plan}
             onChange={(e) => setPlan(e.target.value as LockPlan)}
-            className="w-full rounded-xl bg-black/30 border border-white/[0.08] px-3 py-2 outline-none"
+            className="w-full rounded-xl bg-black/30 border border-white/[0.08] px-3 py-2 text-white outline-none appearance-none select-neo"
           >
             {(Object.keys(LOCK_MULTIPLIERS) as LockPlan[]).map((p) => (
               <option key={p} value={p}>{getPlanLabel(p)}</option>

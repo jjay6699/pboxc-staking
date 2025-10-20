@@ -12,18 +12,24 @@ import SectionIntro from "@/components/SectionIntro";
 import { usePhantom } from "@/hooks/usePhantom";
 import { LockPlan, CONTRACT_ADDRESS, DEFAULT_CLUSTER } from "@/lib/config";
 import { sendSolViaPhantom } from "@/lib/phantom";
+import { apiPost } from "@/lib/api";
 import { useState } from "react";
 
 export default function Home() {
-  const { address, provider, connect, isConnected } = usePhantom() as any;
+  const { address, provider, connect } = usePhantom() as any;
   const [selectedPlan, setSelectedPlan] = useState<LockPlan | null>(null);
   const [open, setOpen] = useState(false);
+  const [positionsVersion, setPositionsVersion] = useState(0);
 
-  const handleStake = async (amount: number) => {
+  const handleStake = async (amount: number, plan: LockPlan) => {
     try {
       const amt = Number(amount);
       if (!amt || amt <= 0) {
         alert("Please enter a valid SOL amount.");
+        return;
+      }
+      if (!plan) {
+        alert("Please select a lock plan.");
         return;
       }
       if (!provider) {
@@ -34,7 +40,21 @@ export default function Home() {
         alert("Phantom is not available.");
         return;
       }
-      await sendSolViaPhantom({ provider: p, recipient: CONTRACT_ADDRESS, amountSol: amt, cluster: DEFAULT_CLUSTER });
+      const signature = await sendSolViaPhantom({ provider: p, recipient: CONTRACT_ADDRESS, amountSol: amt, cluster: DEFAULT_CLUSTER });
+      const walletAddress = address ?? p.publicKey?.toString?.();
+      if (walletAddress) {
+        try {
+          await apiPost("/api/positions", {
+            wallet_address: walletAddress,
+            amount_sol: amt,
+            lock_plan: plan,
+            tx_signature: signature,
+          });
+          setPositionsVersion(v => v + 1);
+        } catch (err) {
+          console.error("Failed to store position locally", err);
+        }
+      }
       setOpen(false);
     } catch (e: any) {
       if (/User rejected/i.test(e?.message)) return; // silent cancel
@@ -75,12 +95,12 @@ export default function Home() {
         open={open}
         plan={selectedPlan}
         onClose={() => setOpen(false)}
-        onStake={(amt: number) => handleStake(amt)}
+        onStake={(amt: number) => selectedPlan && handleStake(amt, selectedPlan)}
       />
 
       <section id="dashboard">
         <SectionIntro className="mt-6 mb-4" title="4) Track earnings and claim" subtitle="Your positions appear here with daily accrual, maturity countdown, and Claim/Restake actions." />
-        <Dashboard wallet={address} />
+        <Dashboard wallet={address} refreshKey={positionsVersion} />
       </section>
 
       <section id="stats">

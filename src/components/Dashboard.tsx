@@ -6,7 +6,7 @@ import { DerivedPosition } from "@/types";
 import { getMaturityTs, getPlanSeconds } from "@/lib/rewards";
 import { getPlanLabel, BASE_RATE } from "@/lib/config";
 
-export default function Dashboard({ wallet }: { wallet: string | null }) {
+export default function Dashboard({ wallet, refreshKey = 0 }: { wallet: string | null; refreshKey?: number }) {
   const [items, setItems] = useState<DerivedPosition[] | null>(null);
   const [now, setNow] = useState<number>(Math.floor(Date.now() / 1000));
 
@@ -17,8 +17,10 @@ export default function Dashboard({ wallet }: { wallet: string | null }) {
 
   useEffect(() => {
     if (!wallet) { setItems(null); return; }
-    apiGet<{ items: DerivedPosition[] }>(`/api/positions?wallet=${wallet}`).then(r => setItems(r.items)).catch(() => setItems([]));
-  }, [wallet]);
+    apiGet<{ items: DerivedPosition[] }>(`/api/positions?wallet=${wallet}`)
+      .then(r => setItems(r.items))
+      .catch(() => setItems([]));
+  }, [wallet, refreshKey]);
 
   if (!wallet) return null;
   if (!items) return <div className="animate-pulse text-white/40">Loading positions…</div>;

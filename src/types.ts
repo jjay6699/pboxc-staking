@@ -12,6 +12,7 @@ export type Position = {
   maturity_ts: number; // seconds
   status: PositionStatus; // persisted; "matured" can be derived at read
   claimed_pboxc: number;
+  tx_signature: string | null;
 };
 
 export type DerivedPosition = Position & {

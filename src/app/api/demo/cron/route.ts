@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { db } from "@/server/db";
 
 let demoDaysOffset = 0;
 

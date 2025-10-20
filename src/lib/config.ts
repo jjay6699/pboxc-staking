@@ -18,7 +18,7 @@ export const LOCK_DURATIONS_SECS: Record<LockPlan, number> = {
 	"12m": 365 * 86400,
 };
 
-export const DEPOSIT_ADDRESS = "326EeauJgTEuNMbSEsTXiaNkq1yLBi1Ftkm5sataJfH8";
+export const DEPOSIT_ADDRESS = "H3jXM8TVeVH9MYEXNipRZKNTErUDySaZdSinVqnKVyak";
 
 export const STAKING_PAUSED = false;
 
