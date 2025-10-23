@@ -7,7 +7,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { useMemo, useState } from "react";
 
 export default function WalletPanel() {
-	const { provider, address, connecting, connect, disconnect, lastError, isConnected, balanceSol } = usePhantom();
+	const { address, lastError, balanceSol } = usePhantom();
 	const [copied, setCopied] = useState(false);
 	const [showQR, setShowQR] = useState(false);
 
@@ -24,11 +24,6 @@ export default function WalletPanel() {
 		setTimeout(() => setCopied(false), 1200);
 	};
 
-	const onPrimary = () => {
-		if (!provider) { window.open("https://phantom.app/", "_blank"); return; }
-		if (isConnected) disconnect(); else connect();
-	};
-
 	return (
 		<div className="w-full rounded-2xl bg-white/[0.02] border border-white/[0.08] shadow-xl backdrop-blur-sm p-6 sm:p-8 card-neo">
 			{/* Header */}
@@ -39,11 +34,11 @@ export default function WalletPanel() {
 				</div>
 				<div className="text-right">
 					<button
-						onClick={onPrimary}
-						disabled={connecting}
+						type="button"
+						disabled
 						className="rounded-xl bg-white text-black px-4 py-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
 					>
-						{connecting ? "Processing..." : !provider ? "Install Phantom" : isConnected ? "Disconnect" : "Connect Phantom"}
+						Coming Soon
 					</button>
 					<div className="text-[11px] text-white/40 mt-1">Phantom only</div>
 					{lastError && <div className="text-[11px] text-red-400 mt-1">{lastError}</div>}
