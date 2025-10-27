@@ -22,7 +22,8 @@ function normalizePosition(raw: any): Position | null {
   if (!raw) return null;
   const wallet = typeof raw.wallet_address === "string" ? raw.wallet_address : String(raw.wallet_address ?? "");
   if (!wallet) return null;
-  const lock_plan = (raw.lock_plan ?? "1w") as LockPlan;
+  const candidate = typeof raw.lock_plan === "string" ? raw.lock_plan : null;
+  const lock_plan = (candidate && candidate in LOCK_MULTIPLIERS ? candidate : "1m") as LockPlan;
   const start_ts = Number(raw.start_ts ?? Math.floor(Date.now() / 1000));
   const maturity_ts = Number(raw.maturity_ts ?? getMaturityTs(start_ts, lock_plan));
   const lock_multiplier =

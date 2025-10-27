@@ -1,21 +1,8 @@
-import { Connection, PublicKey, clusterApiUrl, LAMPORTS_PER_SOL } from "@solana/web3.js";
-import { CONTRACT_ADDRESS, DEFAULT_CLUSTER } from "@/lib/config";
+import { Connection, PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { CONTRACT_ADDRESS } from "@/lib/config";
+import { getRpcCandidates } from "@/server/solanaRpc";
 
 const DEFAULT_COMMITMENT: "confirmed" | "finalized" = "confirmed";
-
-function resolveCluster(cluster: string): "devnet" | "mainnet-beta" | "testnet" {
-  if (cluster === "mainnet" || cluster === "mainnet-beta") return "mainnet-beta";
-  if (cluster === "testnet") return "testnet";
-  return "devnet";
-}
-
-const RPC_ENDPOINT =
-  process.env.SOLANA_RPC_URL ??
-  clusterApiUrl(resolveCluster(DEFAULT_CLUSTER));
-
-const connection = new Connection(RPC_ENDPOINT, {
-  commitment: DEFAULT_COMMITMENT,
-});
 
 const depositPublicKey = new PublicKey(CONTRACT_ADDRESS);
 
@@ -24,6 +11,8 @@ export type VerifiedDeposit = {
   slot: number;
   blockTime: number | null;
   feeLamports: number;
+  cluster: string;
+  endpoint: string;
 };
 
 const LAMPORT_TOLERANCE = 1_000; // ~0.000001 SOL
@@ -32,8 +21,9 @@ export async function verifyDepositSignature(args: {
   signature: string;
   walletAddress: string;
   expectedLamports?: number;
+  cluster?: string | null;
 }): Promise<VerifiedDeposit> {
-  const { signature, walletAddress, expectedLamports } = args;
+  const { signature, walletAddress, expectedLamports, cluster } = args;
   if (!signature) {
     throw new Error("missing_signature");
   }
@@ -46,18 +36,30 @@ export async function verifyDepositSignature(args: {
   }
 
   let tx;
-  try {
-    tx = await connection.getParsedTransaction(signature, {
-      maxSupportedTransactionVersion: 0,
-      commitment: DEFAULT_COMMITMENT,
-    });
-  } catch (e) {
-    console.error("[verifyDeposit] failed to fetch transaction", e);
-    throw new Error("transaction_fetch_failed");
+  let usedCluster: string | null = null;
+  let usedEndpoint: string | null = null;
+  let lastError: Error | null = null;
+  const candidates = getRpcCandidates(cluster);
+  for (const candidate of candidates) {
+    const connection = new Connection(candidate.endpoint, { commitment: DEFAULT_COMMITMENT });
+    try {
+      tx = await fetchTransactionWithRetry(connection, signature);
+    } catch (e: any) {
+      console.error("[verifyDeposit] failed to fetch transaction", candidate.endpoint, e);
+      lastError = e instanceof Error ? e : new Error("transaction_fetch_failed");
+      continue;
+    }
+    if (!tx) {
+      lastError = new Error("transaction_not_found");
+      continue;
+    }
+    usedCluster = candidate.cluster;
+    usedEndpoint = candidate.endpoint;
+    break;
   }
 
   if (!tx) {
-    throw new Error("transaction_not_found");
+    throw lastError ?? new Error("transaction_not_found");
   }
 
   if (tx.meta?.err) {
@@ -114,6 +116,8 @@ export async function verifyDepositSignature(args: {
     slot: tx.slot,
     blockTime: tx.blockTime ?? null,
     feeLamports: tx.meta?.fee ?? 0,
+    cluster: usedCluster ?? (cluster ?? "unknown"),
+    endpoint: usedEndpoint ?? "unknown",
   };
 }
 
@@ -121,4 +125,24 @@ export function lamportsToSol(lamports: number): number {
   return lamports / LAMPORTS_PER_SOL;
 }
 
-export { LAMPORTS_PER_SOL }; 
+export { LAMPORTS_PER_SOL };
+
+async function fetchTransactionWithRetry(connection: Connection, signature: string, attempts = 6, delayMs = 1200) {
+  let lastErr: Error | null = null;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const tx = await connection.getParsedTransaction(signature, {
+        maxSupportedTransactionVersion: 0,
+        commitment: DEFAULT_COMMITMENT,
+      });
+      if (tx) return tx;
+    } catch (err: any) {
+      lastErr = err instanceof Error ? err : new Error("transaction_fetch_failed");
+    }
+    if (i < attempts - 1) {
+      await new Promise(resolve => setTimeout(resolve, delayMs));
+    }
+  }
+  if (lastErr) throw lastErr;
+  return null;
+}

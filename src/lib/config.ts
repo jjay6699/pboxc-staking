@@ -1,7 +1,6 @@
 export const BASE_RATE = 100;
 
 export const LOCK_MULTIPLIERS = {
-	"1w": 1.0,
 	"1m": 1.1,
 	"3m": 1.25,
 	"6m": 1.5,
@@ -11,7 +10,6 @@ export const LOCK_MULTIPLIERS = {
 export type LockPlan = keyof typeof LOCK_MULTIPLIERS;
 
 export const LOCK_DURATIONS_SECS: Record<LockPlan, number> = {
-	"1w": 7 * 86400,
 	"1m": 30 * 86400,
 	"3m": 90 * 86400,
 	"6m": 180 * 86400,
@@ -29,7 +27,6 @@ export const CONTRACT_ADDRESS = DEPOSIT_ADDRESS;
 
 export function getPlanLabel(plan: LockPlan): string {
 	switch (plan) {
-		case "1w": return "1 Week";
 		case "1m": return "1 Month";
 		case "3m": return "3 Months";
 		case "6m": return "6 Months";

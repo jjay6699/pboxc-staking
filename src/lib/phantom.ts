@@ -80,7 +80,7 @@ export function buildPhantomTransferUrl(args: { recipient: string; amountSol?: n
   const qp = new URLSearchParams();
   qp.set("recipient", recipient);
   qp.set("token", "SOL");
-  qp.set("network", cluster === "mainnet" ? "mainnet-beta" : cluster);
+  qp.set("network", normalizeClusterForRpc(cluster));
   if (amountSol && amountSol > 0) qp.set("amount", String(amountSol));
   if (label) qp.set("label", label);
   if (message) qp.set("message", message);
@@ -90,11 +90,10 @@ export function buildPhantomTransferUrl(args: { recipient: string; amountSol?: n
 }
 
 // Build and send a SystemProgram.transfer transaction which will open the Phantom extension UI
-export async function sendSolViaPhantom(args: { provider: PhantomProvider; recipient: string; amountSol: number; cluster?: string }) {
+export async function sendSolViaPhantom(args: { provider: PhantomProvider; recipient: string; amountSol: number; cluster?: string; rpcEndpoint?: string | null }) {
   const { provider, recipient, amountSol, cluster = "devnet" } = args;
-  const { Connection, PublicKey, SystemProgram, Transaction, clusterApiUrl } = await import("@solana/web3.js");
-  const endpoint = cluster === "mainnet" ? clusterApiUrl("mainnet-beta") : clusterApiUrl("devnet");
-  const connection = new Connection(endpoint, "confirmed");
+  const { PublicKey, SystemProgram, Transaction } = await import("@solana/web3.js");
+  const network = normalizeClusterForRpc(cluster);
   if (!provider.publicKey) throw new Error("Wallet not connected");
   const fromPubkey = new PublicKey(provider.publicKey.toString());
   const toPubkey = new PublicKey(recipient);
@@ -102,16 +101,68 @@ export async function sendSolViaPhantom(args: { provider: PhantomProvider; recip
   if (lamports <= 0) throw new Error("Amount must be greater than 0");
   console.log("[PBOXC] building transfer", { from: fromPubkey.toBase58(), to: toPubkey.toBase58(), lamports });
   const ix = SystemProgram.transfer({ fromPubkey, toPubkey, lamports });
-  const { blockhash } = await connection.getLatestBlockhash();
-  const tx = new Transaction({ recentBlockhash: blockhash, feePayer: fromPubkey }).add(ix);
+  const bh = await fetchBlockhashFromApi(network);
+  const tx = new Transaction({ recentBlockhash: bh.blockhash, feePayer: fromPubkey }).add(ix);
+  (tx as any).lastValidBlockHeight = bh.lastValidBlockHeight;
   if (provider.signAndSendTransaction) {
     const { signature } = await provider.signAndSendTransaction(tx, { skipPreflight: false });
-    console.log("[PBOXC] signAndSendTransaction signature", signature);
+    console.log("[PBOXC] signAndSendTransaction signature", signature, "via", bh.endpoint);
     return signature;
   }
   const signed = await provider.signTransaction?.(tx);
   if (!signed) throw new Error("Wallet cannot sign transaction");
-  const sig = await connection.sendRawTransaction(signed.serialize());
-  console.log("[PBOXC] sendRawTransaction signature", sig);
-  return sig;
-} 
+  const base64 = toBase64(signed.serialize());
+  const signature = await sendRawViaApi(base64, network);
+  console.log("[PBOXC] sendRawTransaction via API signature", signature);
+  return signature;
+}
+
+function normalizeClusterForRpc(cluster?: string): "devnet" | "mainnet-beta" | "testnet" {
+  const value = (cluster ?? "devnet").toLowerCase();
+  if (/^https?:\/\//i.test(value)) {
+    if (value.includes("mainnet")) return "mainnet-beta";
+    if (value.includes("testnet")) return "testnet";
+    if (value.includes("devnet")) return "devnet";
+    return "devnet";
+  }
+  if (value === "mainnet") return "mainnet-beta";
+  if (value === "mainnet-beta" || value === "devnet" || value === "testnet") return value as "mainnet-beta" | "devnet" | "testnet";
+  return "devnet";
+}
+
+async function fetchBlockhashFromApi(cluster: string) {
+  const params = new URLSearchParams();
+  if (cluster) params.set("cluster", cluster);
+  const res = await fetch(`/api/solana/blockhash?${params.toString()}`, { cache: "no-store" });
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`blockhash_api ${res.status} ${text}`);
+  }
+  const data = await res.json();
+  if (!data?.blockhash) throw new Error("blockhash_api_missing_data");
+  return data as { blockhash: string; lastValidBlockHeight: number; endpoint: string; cluster: string };
+}
+
+async function sendRawViaApi(serialized: string, cluster: string) {
+  const res = await fetch("/api/solana/sendRaw", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ transaction: serialized, cluster }),
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`sendRaw_api ${res.status} ${text}`);
+  }
+  const data = await res.json();
+  if (!data?.signature) throw new Error("sendRaw_api_missing_signature");
+  return data.signature as string;
+}
+
+function toBase64(bytes: Uint8Array) {
+  if (typeof Buffer !== "undefined") {
+    return Buffer.from(bytes).toString("base64");
+  }
+  let binary = "";
+  bytes.forEach(b => { binary += String.fromCharCode(b); });
+  return btoa(binary);
+}

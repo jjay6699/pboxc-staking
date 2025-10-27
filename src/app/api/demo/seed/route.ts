@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
   }
   const { wallet_address, amount_sol, daysAgo } = parsed.data;
   const start_ts = Math.floor(Date.now() / 1000) - daysAgo * 86400;
-  const position = db.createPosition({ wallet_address, amount_sol, lock_plan: "1w", start_ts });
+  const position = db.createPosition({ wallet_address, amount_sol, lock_plan: "1m", start_ts });
   return NextResponse.json({ position });
 }
 

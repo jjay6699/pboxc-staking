@@ -14,6 +14,7 @@ const CreateSchema = z.object({
     .max(MAX_DEPOSIT_SOL, `amount must be <= ${MAX_DEPOSIT_SOL}`),
   lock_plan: z.custom<LockPlan>(),
   tx_signature: z.string().min(32),
+  cluster: z.string().optional(),
 });
 
 export async function GET(req: NextRequest) {
@@ -30,7 +31,7 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
-  const { wallet_address, amount_sol, lock_plan, tx_signature } = parsed.data;
+  const { wallet_address, amount_sol, lock_plan, tx_signature, cluster } = parsed.data;
 
   if (db.findPositionBySignature(tx_signature) || db.findTxBySignature(tx_signature)) {
     return NextResponse.json({ error: "duplicate_signature" }, { status: 409 });
@@ -44,6 +45,7 @@ export async function POST(req: NextRequest) {
       signature: tx_signature,
       walletAddress: wallet_address,
       expectedLamports,
+      cluster,
     });
   } catch (err) {
     const msg = err instanceof Error ? err.message : "verification_failed";
@@ -72,6 +74,7 @@ export async function POST(req: NextRequest) {
       lock_plan,
       lamports: verified.lamports,
       slot: verified.slot,
+      cluster: verified.cluster ?? cluster,
     },
   });
 

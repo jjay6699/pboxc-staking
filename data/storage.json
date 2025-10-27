@@ -1,0 +1,31 @@
+{
+  "positions": [
+    {
+      "id": "c2tupyo7zhmh90nu6v",
+      "wallet_address": "326EeauJgTEuNMbSEsTXiaNkq1yLBi1Ftkm5sataJfH8",
+      "amount_sol": 0.005,
+      "lock_plan": "1m",
+      "lock_multiplier": 1.1,
+      "start_ts": 1761562216,
+      "maturity_ts": 1764154216,
+      "status": "active",
+      "claimed_pboxc": 0,
+      "tx_signature": "4sttp6wnk5VC1dBKeCG7YvVaWFRbsvpUVhPoB4XBXkiyiC6iXZisF4HvsAWGKeNC5CRtXizaKrvDde3tjU4thUhP"
+    }
+  ],
+  "txs": [
+    {
+      "wallet_address": "326EeauJgTEuNMbSEsTXiaNkq1yLBi1Ftkm5sataJfH8",
+      "type": "deposit",
+      "tx_sig": "4sttp6wnk5VC1dBKeCG7YvVaWFRbsvpUVhPoB4XBXkiyiC6iXZisF4HvsAWGKeNC5CRtXizaKrvDde3tjU4thUhP",
+      "ts": 1761562216,
+      "meta": {
+        "amount_sol": 0.005,
+        "lock_plan": "1m",
+        "lamports": 5000000,
+        "slot": 376123836,
+        "cluster": "mainnet-beta"
+      }
+    }
+  ]
+}

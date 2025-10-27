@@ -16,7 +16,7 @@ import { apiPost } from "@/lib/api";
 import { useState } from "react";
 
 export default function Home() {
-  const { address, provider, connect } = usePhantom() as any;
+  const { address, provider, connect, cluster } = usePhantom();
   const [selectedPlan, setSelectedPlan] = useState<LockPlan | null>(null);
   const [open, setOpen] = useState(false);
   const [positionsVersion, setPositionsVersion] = useState(0);
@@ -40,7 +40,8 @@ export default function Home() {
         alert("Phantom is not available.");
         return;
       }
-      const signature = await sendSolViaPhantom({ provider: p, recipient: CONTRACT_ADDRESS, amountSol: amt, cluster: DEFAULT_CLUSTER });
+      const activeCluster = cluster ?? DEFAULT_CLUSTER;
+      const signature = await sendSolViaPhantom({ provider: p, recipient: CONTRACT_ADDRESS, amountSol: amt, cluster: activeCluster });
       const walletAddress = address ?? p.publicKey?.toString?.();
       if (walletAddress) {
         try {
@@ -49,6 +50,7 @@ export default function Home() {
             amount_sol: amt,
             lock_plan: plan,
             tx_signature: signature,
+            cluster: activeCluster,
           });
           setPositionsVersion(v => v + 1);
         } catch (err) {
