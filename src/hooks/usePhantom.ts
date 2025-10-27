@@ -101,12 +101,11 @@ export function usePhantom() {
   // Detect active network once provider is available/connected
   useEffect(() => {
     const currentProvider = provider;
-    const request = currentProvider?.request;
-    if (!currentProvider || typeof request !== "function") return;
+    if (!currentProvider || typeof currentProvider.request !== "function") return;
     let cancelled = false;
     async function detectCluster() {
       try {
-        const resp = await request.call(currentProvider, { method: "getGenesisHash" });
+        const resp = await currentProvider.request({ method: "getGenesisHash" });
         if (cancelled) return;
         const genesis = typeof resp === "string" ? resp : resp?.result;
         if (typeof genesis === "string" && genesis.length > 0) {
