@@ -101,7 +101,7 @@ export function usePhantom() {
   // Detect active network once provider is available/connected
   useEffect(() => {
     const currentProvider = provider;
-    if (!currentProvider?.request) return;
+    if (!currentProvider || typeof currentProvider.request !== "function") return;
     let cancelled = false;
     async function detectCluster() {
       try {
