@@ -11,7 +11,7 @@ export type PhantomProvider = {
     event: "connect" | "disconnect" | "accountChanged" | "networkChanged" | string,
     handler: (...args: any[]) => void
   ) => void;
-  request?: (args: { method: string; params?: any }) => Promise<any>;
+  request?: (this: PhantomProvider, args: { method: string; params?: any }) => Promise<any>;
   signTransaction?: (tx: any) => Promise<any>;
   signAndSendTransaction?: (tx: any, opts?: any) => Promise<{ signature: string }>;
 };
