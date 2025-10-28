@@ -15,20 +15,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
   const { id, wallet_address } = parsed.data;
-  const p = db.getPositionById(id);
-  if (!p) return NextResponse.json({ error: "not_found" }, { status: 404 });
+  const position = await db.getPositionById(id);
+  if (!position) return NextResponse.json({ error: "not_found" }, { status: 404 });
 
-  if (p.wallet_address !== wallet_address) {
+  if (position.wallet_address !== wallet_address) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 
-  const claimable = isClaimable(p.start_ts, p.lock_plan);
+  const claimable = isClaimable(position.start_ts, position.lock_plan);
   if (!claimable) {
     return NextResponse.json({ error: "not_matured" }, { status: 400 });
   }
 
-  const total = getAccruedPboxc(p.amount_sol, p.lock_plan, p.start_ts);
-  p.claimed_pboxc = total;
-  db.markClaimed(id);
-  return NextResponse.json({ position: p, claimed: total });
+  const total = getAccruedPboxc(position.amount_sol, position.lock_plan, position.start_ts);
+  const updated = await db.markClaimed(id, total);
+  const responsePosition = updated ?? { ...position, claimed_pboxc: total, status: "claimed" };
+  return NextResponse.json({ position: responsePosition, claimed: total });
 }

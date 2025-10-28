@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const wallet = searchParams.get("wallet");
   if (!wallet) return NextResponse.json({ error: "wallet is required" }, { status: 400 });
-  const items = db.listPositionsByWallet(wallet);
+  const items = await db.listPositionsByWallet(wallet);
   return NextResponse.json({ items });
 }
 
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
   }
   const { wallet_address, amount_sol, lock_plan, tx_signature, cluster } = parsed.data;
 
-  if (db.findPositionBySignature(tx_signature) || db.findTxBySignature(tx_signature)) {
+  if ((await db.findPositionBySignature(tx_signature)) || (await db.findTxBySignature(tx_signature))) {
     return NextResponse.json({ error: "duplicate_signature" }, { status: 409 });
   }
 
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
   const onChainAmountSol = lamportsToSol(verified.lamports);
   const timestamp = verified.blockTime ?? Math.floor(Date.now() / 1000);
 
-  const pos = db.createPosition({
+  const pos = await db.createPosition({
     wallet_address,
     amount_sol: onChainAmountSol,
     lock_plan,
@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
     tx_signature,
   });
 
-  db.addTx({
+  await db.addTx({
     wallet_address,
     type: "deposit",
     tx_sig: tx_signature,

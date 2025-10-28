@@ -20,6 +20,19 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Persistent Storage
+
+The staking backend now stores wallet positions and transactions in [Vercel Postgres](https://vercel.com/storage/postgres) when the `POSTGRES_URL` environment variable is present. This guarantees that earnings continue to accrue and are visible after deploys or function restarts.
+
+To enable it:
+
+1. In the Vercel dashboard open **Storage → Postgres** and create a database (or run `vercel postgres create`).
+2. Link the database to this project, then copy the generated `POSTGRES_URL` (and optional pooling URLs).
+3. Add the variable(s) to your project (Vercel dashboard → Settings → Environment Variables).
+4. Redeploy – the API layer will automatically create the required tables on first run.
+
+Locally you can keep using the JSON fallback, or set `ENABLE_FILE_DB=true` to persist to `data/storage.json`.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
