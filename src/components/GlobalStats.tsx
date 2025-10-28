@@ -3,11 +3,23 @@
 import { useEffect, useState } from "react";
 import { apiGet } from "@/lib/api";
 
-export default function GlobalStats() {
+type Props = { refreshKey?: number };
+
+export default function GlobalStats({ refreshKey = 0 }: Props) {
   const [stats, setStats] = useState<{ tvl: number; totalStakers: number; totalDistributed: number } | null>(null);
   useEffect(() => {
-    apiGet<{ tvl: number; totalStakers: number; totalDistributed: number }>("/api/stats").then(setStats).catch(() => setStats({ tvl: 0, totalStakers: 0, totalDistributed: 0 }));
-  }, []);
+    let cancelled = false;
+    apiGet<{ tvl: number; totalStakers: number; totalDistributed: number }>("/api/stats")
+      .then(data => {
+        if (!cancelled) setStats(data);
+      })
+      .catch(() => {
+        if (!cancelled) setStats({ tvl: 0, totalStakers: 0, totalDistributed: 0 });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [refreshKey]);
   const fmt = (n: number) => n.toLocaleString();
   return (
     <div className="grid grid-cols-3 gap-3 mt-8">

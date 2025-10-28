@@ -106,7 +106,7 @@ export default function Home() {
       </section>
 
       <section id="stats">
-        <GlobalStats />
+        <GlobalStats refreshKey={positionsVersion} />
       </section>
 
       <StickySummary address={address} />
