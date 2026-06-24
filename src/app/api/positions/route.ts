@@ -1,18 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/server/db";
-import { LockPlan } from "@/lib/config";
+import { LockPlan, LOCK_MULTIPLIERS } from "@/lib/config";
 import { LAMPORTS_PER_SOL, lamportsToSol, verifyDepositSignature } from "@/server/verifyDeposit";
-
-const MAX_DEPOSIT_SOL = 1000;
 
 const CreateSchema = z.object({
   wallet_address: z.string().min(32),
-  amount_sol: z
-    .number()
-    .positive("amount must be > 0")
-    .max(MAX_DEPOSIT_SOL, `amount must be <= ${MAX_DEPOSIT_SOL}`),
-  lock_plan: z.custom<LockPlan>(),
+  amount_sol: z.number().positive("amount must be > 0"),
+  lock_plan: z.custom<LockPlan>().refine((value) => value in LOCK_MULTIPLIERS),
   tx_signature: z.string().min(32),
   cluster: z.string().optional(),
 });
@@ -32,6 +27,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
   const { wallet_address, amount_sol, lock_plan, tx_signature, cluster } = parsed.data;
+  const settings = await db.getSettings();
+  if (settings.stakingPaused) {
+    return NextResponse.json({ error: "staking_paused" }, { status: 503 });
+  }
+  if (amount_sol < settings.minDepositSol || amount_sol > settings.maxDepositSol) {
+    return NextResponse.json({
+      error: "amount_out_of_range",
+      min: settings.minDepositSol,
+      max: settings.maxDepositSol,
+    }, { status: 400 });
+  }
 
   if ((await db.findPositionBySignature(tx_signature)) || (await db.findTxBySignature(tx_signature))) {
     return NextResponse.json({ error: "duplicate_signature" }, { status: 409 });

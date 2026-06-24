@@ -4,6 +4,11 @@ import { sql } from "@vercel/postgres";
 import { LOCK_MULTIPLIERS, LockPlan } from "@/lib/config";
 import { getAccruedPboxc, getDaysElapsed, getMaturityTs, isClaimable } from "@/lib/rewards";
 import type { DerivedPosition, Position, TxRecord } from "@/types";
+import {
+  DEFAULT_STAKING_SETTINGS,
+  normalizeStakingSettings,
+  StakingSettings,
+} from "@/lib/stakingSettings";
 
 type DbStats = { tvl: number; totalStakers: number; totalDistributed: number };
 
@@ -25,6 +30,8 @@ type DbApi = {
   addTx(tx: TxRecord): Promise<void>;
   findTxBySignature(signature: string): Promise<TxRecord | null>;
   stats(): Promise<DbStats>;
+  getSettings(): Promise<StakingSettings>;
+  updateSettings(settings: StakingSettings): Promise<StakingSettings>;
 };
 
 const postgresConfigured =
@@ -75,6 +82,13 @@ function createPostgresDb(): DbApi {
             meta JSONB
           );
         `;
+        await sql`
+          CREATE TABLE IF NOT EXISTS app_settings (
+            id TEXT PRIMARY KEY,
+            value JSONB NOT NULL,
+            updated_at BIGINT NOT NULL
+          );
+        `;
       })();
     }
     return tablesReady;
@@ -104,9 +118,10 @@ function createPostgresDb(): DbApi {
   return {
     async createPosition(args) {
       await ensureTables();
+      const settings = await this.getSettings();
       const start_ts = args.start_ts ?? Math.floor(Date.now() / 1000);
       const maturity_ts = getMaturityTs(start_ts, args.lock_plan);
-      const lock_multiplier = LOCK_MULTIPLIERS[args.lock_plan];
+      const lock_multiplier = settings.multipliers[args.lock_plan];
       const id = generateId();
 
       if (args.tx_signature) {
@@ -139,6 +154,7 @@ function createPostgresDb(): DbApi {
 
     async listPositionsByWallet(wallet) {
       await ensureTables();
+      const settings = await this.getSettings();
       const res = await sql`
         SELECT * FROM positions WHERE wallet_address = ${wallet} ORDER BY start_ts DESC;
       `;
@@ -150,7 +166,14 @@ function createPostgresDb(): DbApi {
       return res.rows.map(mapPositionRow).map(p => ({
         ...p,
         days_elapsed: getDaysElapsed(p.start_ts, p.lock_plan, now),
-        accrued_pboxc: getAccruedPboxc(p.amount_sol, p.lock_plan, p.start_ts, now),
+        accrued_pboxc: getAccruedPboxc(
+          p.amount_sol,
+          p.lock_plan,
+          p.start_ts,
+          now,
+          p.lock_multiplier,
+          settings.baseRate,
+        ),
         claimable: isClaimable(p.start_ts, p.lock_plan, now),
       }));
     },
@@ -226,6 +249,30 @@ function createPostgresDb(): DbApi {
         totalDistributed: Number(row.total_distributed ?? 0),
       };
     },
+
+    async getSettings() {
+      await ensureTables();
+      const result = await sql`SELECT value, updated_at FROM app_settings WHERE id = 'staking' LIMIT 1;`;
+      if (!result.rowCount || !result.rows[0]) return DEFAULT_STAKING_SETTINGS;
+      return normalizeStakingSettings({
+        ...result.rows[0].value,
+        updatedAt: Number(result.rows[0].updated_at),
+      });
+    },
+
+    async updateSettings(settings) {
+      await ensureTables();
+      const normalized = normalizeStakingSettings(settings);
+      const updatedAt = Math.floor(Date.now() / 1000);
+      const value = JSON.stringify({ ...normalized, updatedAt });
+      await sql`
+        INSERT INTO app_settings (id, value, updated_at)
+        VALUES ('staking', ${value}::jsonb, ${updatedAt})
+        ON CONFLICT (id)
+        DO UPDATE SET value = ${value}::jsonb, updated_at = ${updatedAt};
+      `;
+      return { ...normalized, updatedAt };
+    },
   };
 }
 
@@ -241,11 +288,11 @@ function createFileDb(): DbApi {
     : null;
   const DATA_DIR = DB_FILE ? path.dirname(DB_FILE) : null;
 
-  type DbState = { positions: Position[]; txs: TxRecord[] };
+  type DbState = { positions: Position[]; txs: TxRecord[]; settings: StakingSettings };
 
   const loadState = (): DbState => {
-    if (!DB_FILE) return { positions: [], txs: [] };
-    if (!fs.existsSync(DB_FILE)) return { positions: [], txs: [] };
+    if (!DB_FILE) return { positions: [], txs: [], settings: DEFAULT_STAKING_SETTINGS };
+    if (!fs.existsSync(DB_FILE)) return { positions: [], txs: [], settings: DEFAULT_STAKING_SETTINGS };
     try {
       const contents = fs.readFileSync(DB_FILE, "utf-8");
       const parsed = JSON.parse(contents);
@@ -255,10 +302,14 @@ function createFileDb(): DbApi {
       const txs = Array.isArray(parsed?.txs)
         ? (parsed.txs.map(normalizeTx).filter(Boolean) as TxRecord[])
         : [];
-      return { positions, txs };
+      return {
+        positions,
+        txs,
+        settings: normalizeStakingSettings(parsed?.settings),
+      };
     } catch (e) {
       console.error("[db] Failed to load storage.json, starting fresh", e);
-      return { positions: [], txs: [] };
+      return { positions: [], txs: [], settings: DEFAULT_STAKING_SETTINGS };
     }
   };
 
@@ -278,9 +329,10 @@ function createFileDb(): DbApi {
 
   return {
     async createPosition(args) {
+      const settings = await this.getSettings();
       const start_ts = args.start_ts ?? Math.floor(Date.now() / 1000);
       const maturity_ts = getMaturityTs(start_ts, args.lock_plan);
-      const lock_multiplier = LOCK_MULTIPLIERS[args.lock_plan];
+      const lock_multiplier = settings.multipliers[args.lock_plan];
       if (args.tx_signature) {
         const existing = state.positions.find(p => p.tx_signature === args.tx_signature);
         if (existing) return existing;
@@ -303,6 +355,7 @@ function createFileDb(): DbApi {
     },
 
     async listPositionsByWallet(wallet) {
+      const settings = await this.getSettings();
       let now = Math.floor(Date.now() / 1000);
       try {
         const { getDemoNow } = require("@/app/api/demo/cron/route");
@@ -313,7 +366,14 @@ function createFileDb(): DbApi {
         .map(p => ({
           ...p,
           days_elapsed: getDaysElapsed(p.start_ts, p.lock_plan, now),
-          accrued_pboxc: getAccruedPboxc(p.amount_sol, p.lock_plan, p.start_ts, now),
+          accrued_pboxc: getAccruedPboxc(
+            p.amount_sol,
+            p.lock_plan,
+            p.start_ts,
+            now,
+            p.lock_multiplier,
+            settings.baseRate,
+          ),
           claimable: isClaimable(p.start_ts, p.lock_plan, now),
         }));
     },
@@ -370,6 +430,19 @@ function createFileDb(): DbApi {
         .filter(p => p.status === "claimed")
         .reduce((sum, p) => sum + p.claimed_pboxc, 0);
       return { tvl, totalStakers, totalDistributed };
+    },
+
+    async getSettings() {
+      return normalizeStakingSettings(state.settings);
+    },
+
+    async updateSettings(settings) {
+      state.settings = {
+        ...normalizeStakingSettings(settings),
+        updatedAt: Math.floor(Date.now() / 1000),
+      };
+      persist();
+      return state.settings;
     },
   };
 }

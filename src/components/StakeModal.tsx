@@ -3,13 +3,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, LockKeyhole, ShieldCheck, X } from "lucide-react";
 import {
-  BASE_RATE,
   CONTRACT_ADDRESS,
   LOCK_DURATIONS_SECS,
-  LOCK_MULTIPLIERS,
   LockPlan,
   getPlanLabel,
 } from "@/lib/config";
+import { useStakingSettings } from "@/hooks/useStakingSettings";
 
 type Props = {
   open: boolean;
@@ -22,6 +21,7 @@ type Props = {
 export default function StakeModal({ open, plan, initialAmount, onClose, onStake }: Props) {
   const [amount, setAmount] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const settings = useStakingSettings();
 
   useEffect(() => {
     if (open) {
@@ -40,10 +40,13 @@ export default function StakeModal({ open, plan, initialAmount, onClose, onStake
   }, [open, onClose, submitting]);
 
   const parsed = Number(amount);
-  const validAmount = Number.isFinite(parsed) && parsed > 0;
-  const multiplier = plan ? LOCK_MULTIPLIERS[plan] : 0;
+  const validAmount =
+    Number.isFinite(parsed) &&
+    parsed >= settings.minDepositSol &&
+    parsed <= settings.maxDepositSol;
+  const multiplier = plan ? settings.multipliers[plan] : 0;
   const days = plan ? Math.floor(LOCK_DURATIONS_SECS[plan] / 86400) : 0;
-  const dailyReward = validAmount ? parsed * BASE_RATE * multiplier : 0;
+  const dailyReward = validAmount ? parsed * settings.baseRate * multiplier : 0;
   const totalReward = useMemo(
     () => dailyReward * days,
     [dailyReward, days],
@@ -102,6 +105,9 @@ export default function StakeModal({ open, plan, initialAmount, onClose, onStake
             placeholder="0.00"
             autoFocus
           />
+          <p className="stake-modal-limit">
+            Allowed range: {settings.minDepositSol}–{settings.maxDepositSol} SOL
+          </p>
         </div>
 
         <div className="stake-modal-summary">
@@ -130,10 +136,14 @@ export default function StakeModal({ open, plan, initialAmount, onClose, onStake
         <button
           type="button"
           className="stake-modal-submit"
-          disabled={!validAmount || submitting}
+          disabled={!validAmount || submitting || settings.stakingPaused}
           onClick={submit}
         >
-          {submitting ? "Waiting for Phantom…" : "Continue in Phantom"}
+          {settings.stakingPaused
+            ? "Staking temporarily paused"
+            : submitting
+              ? "Waiting for Phantom…"
+              : "Continue in Phantom"}
           {!submitting && <ArrowRight size={18} />}
         </button>
 

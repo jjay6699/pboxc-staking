@@ -11,10 +11,18 @@ export function getDaysElapsed(startTs: number, plan: LockPlan, nowTs?: number):
 	return Math.max(0, Math.min(maxDays, Math.floor(elapsed / 86400)));
 }
 
-export function getAccruedPboxc(amountSol: number, plan: LockPlan, startTs: number, nowTs?: number): number {
+export function getAccruedPboxc(
+	amountSol: number,
+	plan: LockPlan,
+	startTs: number,
+	nowTs?: number,
+	multiplierOverride?: number,
+	baseRateOverride?: number,
+): number {
 	const days = getDaysElapsed(startTs, plan, nowTs);
-	const multiplier = LOCK_MULTIPLIERS[plan];
-	return amountSol * BASE_RATE * multiplier * days;
+	const multiplier = multiplierOverride ?? LOCK_MULTIPLIERS[plan];
+	const baseRate = baseRateOverride ?? BASE_RATE;
+	return amountSol * baseRate * multiplier * days;
 }
 
 export function getMaturityTs(startTs: number, plan: LockPlan): number {

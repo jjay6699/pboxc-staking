@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 import { apiGet, apiPost } from "@/lib/api";
 import { DerivedPosition } from "@/types";
 import { getMaturityTs, getPlanSeconds } from "@/lib/rewards";
-import { getPlanLabel, BASE_RATE } from "@/lib/config";
+import { getPlanLabel } from "@/lib/config";
+import { useStakingSettings } from "@/hooks/useStakingSettings";
 
 export default function Dashboard({ wallet, refreshKey = 0 }: { wallet: string | null; refreshKey?: number }) {
   const [items, setItems] = useState<DerivedPosition[] | null>(null);
   const [now, setNow] = useState<number>(Math.floor(Date.now() / 1000));
+  const settings = useStakingSettings();
 
   useEffect(() => {
     const t = setInterval(() => setNow(Math.floor(Date.now() / 1000)), 1000);
@@ -57,7 +59,7 @@ export default function Dashboard({ wallet, refreshKey = 0 }: { wallet: string |
         const hh = Math.floor((remain % 86400) / 3600);
         const mm = Math.floor((remain % 3600) / 60);
         const claimDisabled = !p.claimable;
-        const dailyPboxc = Math.floor(p.amount_sol * BASE_RATE * p.lock_multiplier);
+        const dailyPboxc = Math.floor(p.amount_sol * settings.baseRate * p.lock_multiplier);
 
         return (
           <div key={p.id} className="rounded-2xl bg-white/[0.03] border border-white/[0.08] p-4 card-neo">

@@ -1,15 +1,20 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { BASE_RATE, LOCK_DURATIONS_SECS, LOCK_MULTIPLIERS, LockPlan, getPlanLabel } from "@/lib/config";
+import { LOCK_DURATIONS_SECS, LockPlan, getPlanLabel } from "@/lib/config";
+import { useStakingSettings } from "@/hooks/useStakingSettings";
 
 export default function Calculator() {
   const [amount, setAmount] = useState<number>(1);
   const [plan, setPlan] = useState<LockPlan>("1m");
+  const settings = useStakingSettings();
 
-  const multiplier = LOCK_MULTIPLIERS[plan];
+  const multiplier = settings.multipliers[plan];
   const days = Math.floor(LOCK_DURATIONS_SECS[plan] / 86400);
-  const daily = useMemo(() => Math.max(0, amount) * BASE_RATE * multiplier, [amount, multiplier]);
+  const daily = useMemo(
+    () => Math.max(0, amount) * settings.baseRate * multiplier,
+    [amount, settings.baseRate, multiplier],
+  );
   const total = useMemo(() => daily * days, [daily, days]);
 
   return (
@@ -36,7 +41,7 @@ export default function Calculator() {
             onChange={(event) => setPlan(event.target.value as LockPlan)}
             className="calculator-control select-neo"
           >
-            {(Object.keys(LOCK_MULTIPLIERS) as LockPlan[]).map((item) => (
+            {(Object.keys(settings.multipliers) as LockPlan[]).map((item) => (
               <option key={item} value={item}>{getPlanLabel(item)}</option>
             ))}
           </select>

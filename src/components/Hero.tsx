@@ -3,13 +3,12 @@
 import { ArrowDown, ArrowRight, ShieldCheck } from "lucide-react";
 import { useMemo, useState } from "react";
 import {
-  BASE_RATE,
   LOCK_DURATIONS_SECS,
-  LOCK_MULTIPLIERS,
   LockPlan,
   getPlanLabel,
 } from "@/lib/config";
 import { usePhantom } from "@/hooks/usePhantom";
+import { useStakingSettings } from "@/hooks/useStakingSettings";
 
 type Props = {
   onContinue: (plan: LockPlan, amount: number) => void;
@@ -19,13 +18,14 @@ export default function Hero({ onContinue }: Props) {
   const [amount, setAmount] = useState("1");
   const [plan, setPlan] = useState<LockPlan>("3m");
   const { provider, address, connecting, connect, networkLabel, balanceSol } = usePhantom();
+  const settings = useStakingSettings();
 
   const numericAmount = Math.max(0, Number(amount) || 0);
-  const multiplier = LOCK_MULTIPLIERS[plan];
+  const multiplier = settings.multipliers[plan];
   const days = Math.floor(LOCK_DURATIONS_SECS[plan] / 86400);
   const total = useMemo(
-    () => numericAmount * BASE_RATE * multiplier * days,
-    [numericAmount, multiplier, days],
+    () => numericAmount * settings.baseRate * multiplier * days,
+    [numericAmount, settings.baseRate, multiplier, days],
   );
 
   const primaryLabel = address
@@ -41,7 +41,11 @@ export default function Hero({ onContinue }: Props) {
       await connect();
       return;
     }
-    if (numericAmount > 0) onContinue(plan, numericAmount);
+    if (
+      !settings.stakingPaused &&
+      numericAmount >= settings.minDepositSol &&
+      numericAmount <= settings.maxDepositSol
+    ) onContinue(plan, numericAmount);
   };
 
   return (
@@ -78,7 +82,7 @@ export default function Hero({ onContinue }: Props) {
           </div>
           <span className="assurance-divider" />
           <div>
-            <span className="assurance-value">100</span>
+            <span className="assurance-value">{settings.baseRate.toLocaleString()}</span>
             <span>PBOXC / SOL / day</span>
           </div>
         </div>
@@ -92,7 +96,7 @@ export default function Hero({ onContinue }: Props) {
           </div>
           <div className="stake-rate">
             <span>Base rate</span>
-            <strong>{BASE_RATE} PBOXC/day</strong>
+            <strong>{settings.baseRate.toLocaleString()} PBOXC/day</strong>
           </div>
         </div>
 
@@ -127,7 +131,7 @@ export default function Hero({ onContinue }: Props) {
             <span>{multiplier.toFixed(2)}× multiplier</span>
           </div>
           <div className="period-grid">
-            {(Object.keys(LOCK_MULTIPLIERS) as LockPlan[]).map((item) => (
+            {(Object.keys(settings.multipliers) as LockPlan[]).map((item) => (
               <button
                 key={item}
                 type="button"
@@ -152,22 +156,29 @@ export default function Hero({ onContinue }: Props) {
           </div>
           <div>
             <span>Daily reward</span>
-            <strong>{Math.floor(numericAmount * BASE_RATE * multiplier).toLocaleString()} PBOXC</strong>
+            <strong>{Math.floor(numericAmount * settings.baseRate * multiplier).toLocaleString()} PBOXC</strong>
           </div>
         </div>
 
         <button
           type="button"
           onClick={onPrimary}
-          disabled={connecting || numericAmount <= 0}
+          disabled={
+            connecting ||
+            settings.stakingPaused ||
+            numericAmount < settings.minDepositSol ||
+            numericAmount > settings.maxDepositSol
+          }
           className="stake-submit"
         >
-          {primaryLabel}
+          {settings.stakingPaused ? "Staking temporarily paused" : primaryLabel}
           {!connecting && <ArrowRight size={18} />}
         </button>
 
         <p className="stake-disclaimer">
-          Funds remain locked until the selected plan reaches maturity.
+          {settings.stakingPaused
+            ? "New positions are temporarily unavailable."
+            : `Minimum ${settings.minDepositSol} SOL · Maximum ${settings.maxDepositSol} SOL`}
         </p>
       </div>
     </section>

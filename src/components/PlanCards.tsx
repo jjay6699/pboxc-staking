@@ -1,10 +1,12 @@
 "use client";
 
-import { LOCK_MULTIPLIERS, BASE_RATE, LockPlan, getPlanLabel } from "@/lib/config";
+import { LockPlan, getPlanLabel } from "@/lib/config";
 import { cn } from "@/lib/ui";
+import { useStakingSettings } from "@/hooks/useStakingSettings";
 
 export default function PlanCards({ onSelect }: { onSelect: (plan: LockPlan) => void }) {
-  const entries = Object.entries(LOCK_MULTIPLIERS) as [LockPlan, number][];
+  const settings = useStakingSettings();
+  const entries = Object.entries(settings.multipliers) as [LockPlan, number][];
 
   return (
     <div className="plan-grid">
@@ -25,7 +27,7 @@ export default function PlanCards({ onSelect }: { onSelect: (plan: LockPlan) => 
           <div className="plan-divider" />
           <div className="plan-return">
             <span>Daily return per 1 SOL</span>
-            <strong>{(BASE_RATE * multiplier).toFixed(0)} PBOXC</strong>
+            <strong>{(settings.baseRate * multiplier).toFixed(0)} PBOXC</strong>
           </div>
           <div className="plan-action">Select plan <span>→</span></div>
         </button>

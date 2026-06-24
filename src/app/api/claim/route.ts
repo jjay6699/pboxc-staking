@@ -27,7 +27,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "not_matured" }, { status: 400 });
   }
 
-  const total = getAccruedPboxc(position.amount_sol, position.lock_plan, position.start_ts);
+  const settings = await db.getSettings();
+  const total = getAccruedPboxc(
+    position.amount_sol,
+    position.lock_plan,
+    position.start_ts,
+    undefined,
+    position.lock_multiplier,
+    settings.baseRate,
+  );
   const updated = await db.markClaimed(id, total);
   const responsePosition = updated ?? { ...position, claimed_pboxc: total, status: "claimed" };
   return NextResponse.json({ position: responsePosition, claimed: total });
