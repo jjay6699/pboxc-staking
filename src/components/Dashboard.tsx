@@ -22,7 +22,16 @@ export default function Dashboard({ wallet, refreshKey = 0 }: { wallet: string |
       .catch(() => setItems([]));
   }, [wallet, refreshKey]);
 
-  if (!wallet) return null;
+  if (!wallet) return (
+    <div className="portfolio-empty">
+      <div>
+        <span className="portfolio-status">NO WALLET CONNECTED</span>
+        <h3>Your staking positions will appear here.</h3>
+        <p>Connect Phantom from the header to view active stakes, accrued rewards, and maturity dates.</p>
+      </div>
+      <a href="#stake">Go to staking</a>
+    </div>
+  );
   if (!items) return <div className="animate-pulse text-white/40">Loading positions…</div>;
 
   const fmt = (s: number) => s.toLocaleString();
@@ -30,7 +39,14 @@ export default function Dashboard({ wallet, refreshKey = 0 }: { wallet: string |
   return (
     <div className="space-y-3">
       {items.length === 0 && (
-        <div className="text-white/60 text-sm">No positions yet.</div>
+        <div className="portfolio-empty">
+          <div>
+            <span className="portfolio-status">PORTFOLIO READY</span>
+            <h3>No active positions yet.</h3>
+            <p>Choose a staking plan to create your first PBOXC reward position.</p>
+          </div>
+          <a href="#plans">Choose a plan</a>
+        </div>
       )}
       {items.map(p => {
         const remain = Math.max(0, getMaturityTs(p.start_ts, p.lock_plan) - now);

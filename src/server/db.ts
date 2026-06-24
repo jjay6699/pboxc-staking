@@ -18,6 +18,7 @@ type CreatePositionArgs = {
 type DbApi = {
   createPosition(args: CreatePositionArgs): Promise<Position>;
   listPositionsByWallet(wallet: string): Promise<DerivedPosition[]>;
+  listRecentVerifiedPositions(limit?: number): Promise<Position[]>;
   getPositionById(id: string): Promise<Position | null>;
   findPositionBySignature(signature: string): Promise<Position | null>;
   markClaimed(id: string, claimedAmount: number): Promise<Position | null>;
@@ -152,6 +153,20 @@ function createPostgresDb(): DbApi {
         accrued_pboxc: getAccruedPboxc(p.amount_sol, p.lock_plan, p.start_ts, now),
         claimable: isClaimable(p.start_ts, p.lock_plan, now),
       }));
+    },
+
+    async listRecentVerifiedPositions(limit = 20) {
+      await ensureTables();
+      const safeLimit = Math.min(50, Math.max(1, Math.floor(limit)));
+      const res = await sql`
+        SELECT p.*
+        FROM positions p
+        INNER JOIN txs t ON t.tx_sig = p.tx_signature AND t.type = 'deposit'
+        WHERE p.tx_signature IS NOT NULL
+        ORDER BY p.start_ts DESC
+        LIMIT ${safeLimit};
+      `;
+      return res.rows.map(mapPositionRow);
     },
 
     async getPositionById(id) {
@@ -301,6 +316,20 @@ function createFileDb(): DbApi {
           accrued_pboxc: getAccruedPboxc(p.amount_sol, p.lock_plan, p.start_ts, now),
           claimable: isClaimable(p.start_ts, p.lock_plan, now),
         }));
+    },
+
+    async listRecentVerifiedPositions(limit = 20) {
+      const safeLimit = Math.min(50, Math.max(1, Math.floor(limit)));
+      return [...state.positions]
+        .filter(position =>
+          !!position.tx_signature &&
+          state.txs.some(tx =>
+            tx.type === "deposit" &&
+            tx.tx_sig === position.tx_signature
+          )
+        )
+        .sort((a, b) => b.start_ts - a.start_ts)
+        .slice(0, safeLimit);
     },
 
     async getPositionById(id) {

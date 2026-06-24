@@ -13,54 +13,54 @@ export default function Calculator() {
   const total = useMemo(() => daily * days, [daily, days]);
 
   return (
-    <div className="rounded-2xl bg-white/[0.03] border border-white/[0.08] p-5 card-neo">
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="space-y-2">
-          <label className="text-sm text-white/70">Amount (SOL)</label>
+    <div className="calculator-panel">
+      <div className="calculator-inputs">
+        <div className="calculator-field">
+          <label htmlFor="calculator-amount">Amount to stake</label>
+          <span className="field-suffix">SOL</span>
           <input
+            id="calculator-amount"
             type="number"
             min={0}
             step={0.0001}
             value={amount}
-            onChange={(e) => setAmount(parseFloat(e.target.value) || 0)}
-            className="w-full rounded-xl bg-black/30 border border-white/[0.08] px-3 py-2 outline-none"
-            placeholder="1"
+            onChange={(event) => setAmount(parseFloat(event.target.value) || 0)}
+            className="calculator-control"
           />
         </div>
-        <div className="space-y-2">
-          <label className="text-sm text-white/70">Lock Plan</label>
+        <div className="calculator-field">
+          <label htmlFor="calculator-plan">Lock period</label>
           <select
+            id="calculator-plan"
             value={plan}
-            onChange={(e) => setPlan(e.target.value as LockPlan)}
-            className="w-full rounded-xl bg-black/30 border border-white/[0.08] px-3 py-2 text-white outline-none appearance-none select-neo"
+            onChange={(event) => setPlan(event.target.value as LockPlan)}
+            className="calculator-control select-neo"
           >
-            {(Object.keys(LOCK_MULTIPLIERS) as LockPlan[]).map((p) => (
-              <option key={p} value={p}>{getPlanLabel(p)}</option>
+            {(Object.keys(LOCK_MULTIPLIERS) as LockPlan[]).map((item) => (
+              <option key={item} value={item}>{getPlanLabel(item)}</option>
             ))}
           </select>
         </div>
-        <div className="space-y-2">
-          <label className="text-sm text-white/70">Multiplier</label>
-          <div className="rounded-xl bg-black/30 border border-white/[0.08] px-3 py-2">{multiplier.toFixed(2)}×</div>
+        <div className="calculator-field">
+          <label>Reward multiplier</label>
+          <div className="calculator-control calculator-readonly">{multiplier.toFixed(2)}×</div>
         </div>
       </div>
 
-      <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="rounded-xl bg-white/[0.04] border border-white/[0.08] p-3">
-          <div className="text-xs text-white/60">Daily PBOXC</div>
-          <div className="text-lg font-semibold">{Math.floor(daily).toLocaleString()} PBOXC</div>
+      <div className="calculator-results">
+        <div>
+          <span>Daily reward</span>
+          <strong>{Math.floor(daily).toLocaleString()} <small>PBOXC</small></strong>
         </div>
-        <div className="rounded-xl bg-white/[0.04] border border-white/[0.08] p-3">
-          <div className="text-xs text-white/60">Duration</div>
-          <div className="text-lg font-semibold">{days} days</div>
+        <div>
+          <span>Lock duration</span>
+          <strong>{days} <small>days</small></strong>
         </div>
-        <div className="rounded-xl bg-white/[0.04] border border-white/[0.08] p-3">
-          <div className="text-xs text-white/60">Total PBOXC</div>
-          <div className="text-lg font-semibold">{Math.floor(total).toLocaleString()} PBOXC</div>
+        <div className="calculator-total">
+          <span>Projected total</span>
+          <strong>{Math.floor(total).toLocaleString()} <small>PBOXC</small></strong>
         </div>
       </div>
     </div>
   );
 }
-
-

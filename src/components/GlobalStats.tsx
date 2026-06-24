@@ -7,33 +7,38 @@ type Props = { refreshKey?: number };
 
 export default function GlobalStats({ refreshKey = 0 }: Props) {
   const [stats, setStats] = useState<{ tvl: number; totalStakers: number; totalDistributed: number } | null>(null);
+
   useEffect(() => {
     let cancelled = false;
     apiGet<{ tvl: number; totalStakers: number; totalDistributed: number }>("/api/stats")
-      .then(data => {
+      .then((data) => {
         if (!cancelled) setStats(data);
       })
       .catch(() => {
         if (!cancelled) setStats({ tvl: 0, totalStakers: 0, totalDistributed: 0 });
       });
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [refreshKey]);
-  const fmt = (n: number) => n.toLocaleString();
+
+  const format = (value: number) => value.toLocaleString();
+
   return (
-    <div className="grid grid-cols-3 gap-3 mt-8">
-      <div className="rounded-2xl bg-white/[0.03] border border-white/[0.08] p-4">
-        <div className="text-xs text-white/60">TVL (SOL)</div>
-        <div className="text-lg font-medium">{stats ? fmt(stats.tvl) : "—"}</div>
+    <div className="stats-band">
+      <div className="stats-intro">
+        <span>PLATFORM ACTIVITY</span>
+        <strong>Staking at a glance</strong>
       </div>
-      <div className="rounded-2xl bg-white/[0.03] border border-white/[0.08] p-4">
-        <div className="text-xs text-white/60">Total stakers</div>
-        <div className="text-lg font-medium">{stats ? fmt(stats.totalStakers) : "—"}</div>
+      <div className="stat-item">
+        <span>Total value locked</span>
+        <strong>{stats ? format(stats.tvl) : "—"} <small>SOL</small></strong>
       </div>
-      <div className="rounded-2xl bg-white/[0.03] border border-white/[0.08] p-4">
-        <div className="text-xs text-white/60">Total PBOXC distributed</div>
-        <div className="text-lg font-medium">{stats ? fmt(stats.totalDistributed) : "—"}</div>
+      <div className="stat-item">
+        <span>Total stakers</span>
+        <strong>{stats ? format(stats.totalStakers) : "—"}</strong>
+      </div>
+      <div className="stat-item">
+        <span>PBOXC distributed</span>
+        <strong>{stats ? format(stats.totalDistributed) : "—"} <small>PBOXC</small></strong>
       </div>
     </div>
   );

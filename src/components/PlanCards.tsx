@@ -5,26 +5,31 @@ import { cn } from "@/lib/ui";
 
 export default function PlanCards({ onSelect }: { onSelect: (plan: LockPlan) => void }) {
   const entries = Object.entries(LOCK_MULTIPLIERS) as [LockPlan, number][];
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {entries.map(([plan, mult]) => {
-        const daily = 1 * BASE_RATE * mult; // 1 SOL baseline
-        return (
-          <button key={plan} onClick={() => onSelect(plan)} className={cn(
-            "rounded-2xl text-left p-5 bg-white/[0.03] border border-white/[0.08] transition duration-200 card-neo",
-            "shadow-sm"
-          )}>
-            <div className="flex items-center justify-between">
-              <div className="text-base font-semibold">{getPlanLabel(plan)}</div>
-              <div className="text-xs px-2 py-0.5 rounded-full bg-white/[0.08]">Locked • No early claim</div>
-            </div>
-            <div className="mt-2 text-sm text-white/70">Multiplier</div>
-            <div className="text-lg font-medium">{mult.toFixed(2)}×</div>
-            <div className="mt-3 text-sm text-white/70">Est. daily per 1 SOL</div>
-            <div className="text-lg font-medium">{daily.toFixed(0)} PBOXC</div>
-          </button>
-        );
-      })}
+    <div className="plan-grid">
+      {entries.map(([plan, multiplier], index) => (
+        <button
+          key={plan}
+          onClick={() => onSelect(plan)}
+          className={cn("plan-card", index === entries.length - 1 && "plan-card-featured")}
+        >
+          <div className="plan-card-top">
+            <span className="plan-index">{String(index + 1).padStart(2, "0")}</span>
+            {index === entries.length - 1
+              ? <span className="plan-badge">Highest reward</span>
+              : <span className="plan-lock">Fixed term</span>}
+          </div>
+          <h3>{getPlanLabel(plan)}</h3>
+          <div className="plan-multiplier">{multiplier.toFixed(2)}× <span>multiplier</span></div>
+          <div className="plan-divider" />
+          <div className="plan-return">
+            <span>Daily return per 1 SOL</span>
+            <strong>{(BASE_RATE * multiplier).toFixed(0)} PBOXC</strong>
+          </div>
+          <div className="plan-action">Select plan <span>→</span></div>
+        </button>
+      ))}
     </div>
   );
 }

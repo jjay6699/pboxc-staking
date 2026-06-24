@@ -1,66 +1,146 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { LockPlan, LOCK_MULTIPLIERS, getPlanLabel } from "@/lib/config";
-import { cn } from "@/lib/ui";
+import { useEffect, useMemo, useState } from "react";
+import { ArrowRight, LockKeyhole, ShieldCheck, X } from "lucide-react";
+import {
+  BASE_RATE,
+  CONTRACT_ADDRESS,
+  LOCK_DURATIONS_SECS,
+  LOCK_MULTIPLIERS,
+  LockPlan,
+  getPlanLabel,
+} from "@/lib/config";
 
 type Props = {
   open: boolean;
   plan: LockPlan | null;
+  initialAmount?: number;
   onClose: () => void;
-  onStake: (amount: number) => void;
+  onStake: (amount: number) => void | Promise<void>;
 };
 
-export default function StakeModal({ open, plan, onClose, onStake }: Props) {
-  const [amount, setAmount] = useState<string>("");
+export default function StakeModal({ open, plan, initialAmount, onClose, onStake }: Props) {
+  const [amount, setAmount] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (open) setAmount("");
-  }, [open]);
+    if (open) {
+      setAmount(initialAmount ? String(initialAmount) : "");
+      setSubmitting(false);
+    }
+  }, [open, initialAmount]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !submitting) onClose();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [open, onClose, submitting]);
+
+  const parsed = Number(amount);
+  const validAmount = Number.isFinite(parsed) && parsed > 0;
+  const multiplier = plan ? LOCK_MULTIPLIERS[plan] : 0;
+  const days = plan ? Math.floor(LOCK_DURATIONS_SECS[plan] / 86400) : 0;
+  const dailyReward = validAmount ? parsed * BASE_RATE * multiplier : 0;
+  const totalReward = useMemo(
+    () => dailyReward * days,
+    [dailyReward, days],
+  );
 
   if (!open || !plan) return null;
 
-  const parsed = parseFloat(amount);
-  const disabled = !parsed || parsed <= 0;
-  const multiplier = LOCK_MULTIPLIERS[plan];
+  const submit = async () => {
+    if (!validAmount || submitting) return;
+    setSubmitting(true);
+    try {
+      await onStake(parsed);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/60" onClick={onClose} />
-      <div className={cn(
-        "relative z-10 w-[92%] sm:w-[420px] rounded-2xl p-5",
-        "bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))]",
-        "border border-white/10 shadow-2xl backdrop-blur"
-      )}>
-        <div className="text-lg font-semibold">Stake SOL</div>
-        <div className="mt-1 text-sm text-white/70">{getPlanLabel(plan)} • {multiplier.toFixed(2)}×</div>
+    <div className="stake-modal-root" role="dialog" aria-modal="true" aria-labelledby="stake-modal-title">
+      <button className="stake-modal-backdrop" aria-label="Close staking dialog" onClick={onClose} />
+      <div className="stake-modal">
+        <div className="stake-modal-header">
+          <div>
+            <p>REVIEW POSITION</p>
+            <h2 id="stake-modal-title">Stake SOL</h2>
+          </div>
+          <button type="button" className="stake-modal-close" onClick={onClose} disabled={submitting} aria-label="Close">
+            <X size={19} />
+          </button>
+        </div>
 
-        <div className="mt-4 space-y-2">
-          <label className="text-sm text-white/70">Amount (SOL)</label>
+        <div className="stake-modal-plan">
+          <div className="stake-modal-plan-icon"><LockKeyhole size={18} /></div>
+          <div>
+            <span>Selected lock plan</span>
+            <strong>{getPlanLabel(plan)}</strong>
+          </div>
+          <div className="stake-modal-multiplier">
+            <span>Multiplier</span>
+            <strong>{multiplier.toFixed(2)}×</strong>
+          </div>
+        </div>
+
+        <div className="stake-modal-field">
+          <div className="stake-modal-label">
+            <label htmlFor="stake-modal-amount">Amount to stake</label>
+            <span>SOL</span>
+          </div>
           <input
+            id="stake-modal-amount"
             type="number"
-            min={0}
-            step={0.0001}
+            min="0"
+            step="0.0001"
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            className="w-full rounded-xl bg-black/30 border border-white/[0.12] px-3 py-2 outline-none"
-            placeholder="Enter amount"
+            onChange={(event) => setAmount(event.target.value)}
+            placeholder="0.00"
+            autoFocus
           />
         </div>
 
-        <div className="mt-5 flex items-center justify-end gap-2">
-          <button onClick={onClose} className="px-4 py-2 rounded-xl border border-white/15 text-sm">Cancel</button>
-          <button
-            disabled={disabled}
-            onClick={() => !disabled && onStake(parsed)}
-            className="px-4 py-2 rounded-xl bg-white text-black text-sm font-medium disabled:opacity-50"
-          >
-            Confirm
-          </button>
+        <div className="stake-modal-summary">
+          <div>
+            <span>Daily reward</span>
+            <strong>{Math.floor(dailyReward).toLocaleString()} PBOXC</strong>
+          </div>
+          <div>
+            <span>Lock duration</span>
+            <strong>{days} days</strong>
+          </div>
+          <div>
+            <span>Projected total</span>
+            <strong>{Math.floor(totalReward).toLocaleString()} PBOXC</strong>
+          </div>
         </div>
+
+        <div className="stake-modal-destination">
+          <ShieldCheck size={17} />
+          <div>
+            <span>Verified destination</span>
+            <code>{CONTRACT_ADDRESS.slice(0, 8)}…{CONTRACT_ADDRESS.slice(-8)}</code>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          className="stake-modal-submit"
+          disabled={!validAmount || submitting}
+          onClick={submit}
+        >
+          {submitting ? "Waiting for Phantom…" : "Continue in Phantom"}
+          {!submitting && <ArrowRight size={18} />}
+        </button>
+
+        <p className="stake-modal-note">
+          Phantom will show the final recipient, amount, and network before you approve the transaction.
+        </p>
       </div>
     </div>
   );
 }
-
-
