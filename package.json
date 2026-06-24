@@ -9,12 +9,12 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@vercel/postgres": "^0.10.0",
     "@solana/web3.js": "^1.98.4",
+    "@vercel/postgres": "^0.10.0",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.18",
     "lucide-react": "^0.542.0",
-    "next": "15.5.2",
+    "next": "15.5.19",
     "qrcode.react": "^4.2.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
@@ -27,7 +27,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "15.5.2",
+    "eslint-config-next": "15.5.19",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
