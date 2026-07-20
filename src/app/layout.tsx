@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     default: "CREX Staking",
     template: "%s | CREX Staking",
   },
-  description: "Stake CREX into time-locked plans to earn daily CREX rewards.",
+  description: "Stake testnet ERC-20 tokens into time-locked plans to earn daily CREX rewards.",
   keywords: ["CREX", "staking", "CREX Chain", "CREX", "Wallet", "crypto", "web3", "DeFi"],
   applicationName: "CREX Staking",
   authors: [{ name: "CREX" }],
@@ -32,13 +32,13 @@ export const metadata: Metadata = {
     url: "/",
     siteName: "CREX Staking",
     title: "CREX Staking",
-    description: "Stake CREX into time-locked plans to earn daily CREX rewards.",
+    description: "Stake testnet ERC-20 tokens into time-locked plans to earn daily CREX rewards.",
     images: [{ url: "/logo-header.png", width: 512, height: 512, alt: "CREX" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "CREX Staking",
-    description: "Stake CREX into time-locked plans to earn daily CREX rewards.",
+    description: "Stake testnet ERC-20 tokens into time-locked plans to earn daily CREX rewards.",
     images: ["/logo-header.png"],
   },
   icons: {
@@ -68,12 +68,12 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               <div className="footer-main">
                 <div className="footer-brand">
                   <Image src="/logo-header.png" width={72} height={72} alt="CREX" className="site-logo footer-logo" />
-                  <p>Fixed-term CREX staking with transparent, predictable CREX rewards.</p>
+                  <p>Fixed-term ERC-20 staking with transparent, predictable CREX rewards.</p>
                 </div>
                 <div className="footer-links">
                   <div>
                     <span>Staking</span>
-                    <a href="#stake">Stake CREX</a>
+                    <a href="#stake">Stake ERC-20</a>
                     <a href="#live-stakes">Live stakes</a>
                     <a href="#plans">Lock plans</a>
                     <a href="#calculator">Calculator</a>
@@ -88,7 +88,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               </div>
               <div className="footer-bottom">
                 <span>© 2026 Connect Redefine Exchange. All rights reserved.</span>
-                <span>Built on CREX Chain · CREX staking</span>
+                <span>Built on CREX Chain · ERC-20 staking</span>
               </div>
             </div>
           </footer>

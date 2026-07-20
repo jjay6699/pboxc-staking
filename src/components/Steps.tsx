@@ -4,7 +4,7 @@ export default function Steps() {
   const steps = [
     { title: "Connect wallet", desc: "Connect your EVM wallet" },
     { title: "Choose a plan", desc: "Select amount and duration" },
-    { title: "Confirm stake", desc: "Approve the CREX transaction" },
+    { title: "Confirm stake", desc: "Approve the ERC-20 staking transaction" },
     { title: "Claim rewards", desc: "Collect CREX at maturity" },
   ];
 

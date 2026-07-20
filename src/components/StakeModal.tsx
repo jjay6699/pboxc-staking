@@ -71,7 +71,7 @@ export default function StakeModal({ open, plan, initialAmount, onClose, onStake
         <div className="stake-modal-header">
           <div>
             <p>REVIEW POSITION</p>
-            <h2 id="stake-modal-title">Stake CREX</h2>
+            <h2 id="stake-modal-title">Stake ERC-20</h2>
           </div>
           <button type="button" className="stake-modal-close" onClick={onClose} disabled={submitting} aria-label="Close">
             <X size={19} />
@@ -93,7 +93,7 @@ export default function StakeModal({ open, plan, initialAmount, onClose, onStake
         <div className="stake-modal-field">
           <div className="stake-modal-label">
             <label htmlFor="stake-modal-amount">Amount to stake</label>
-            <span>CREX</span>
+            <span>TOKEN</span>
           </div>
           <input
             id="stake-modal-amount"
@@ -106,7 +106,7 @@ export default function StakeModal({ open, plan, initialAmount, onClose, onStake
             autoFocus
           />
           <p className="stake-modal-limit">
-            Allowed range: {settings.minDepositSol}–{settings.maxDepositSol} CREX
+            Allowed range: {settings.minDepositSol}–{settings.maxDepositSol} token
           </p>
         </div>
 

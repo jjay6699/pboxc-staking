@@ -53,7 +53,7 @@ export default function Hero({ onContinue }: Props) {
       <div className="hero-copy">
         <div className="eyebrow">CREX STAKING ON CREX CHAIN</div>
         <h1 className="hero-title">
-          Put your CREX to work.
+          Put your ERC-20 tokens to work.
           <span>Earn CREX daily.</span>
         </h1>
         <p className="hero-description">
@@ -83,7 +83,7 @@ export default function Hero({ onContinue }: Props) {
           <span className="assurance-divider" />
           <div>
             <span className="assurance-value">{settings.baseRate.toLocaleString()}</span>
-            <span>CREX / ERC-20 CREX / day</span>
+            <span>CREX / staked token / day</span>
           </div>
         </div>
       </div>
@@ -92,7 +92,7 @@ export default function Hero({ onContinue }: Props) {
         <div className="stake-card-header">
           <div>
             <p className="stake-card-kicker">NEW POSITION</p>
-            <h2>Stake CREX</h2>
+            <h2>Stake ERC-20</h2>
           </div>
           <div className="stake-rate">
             <span>Base rate</span>
@@ -103,7 +103,7 @@ export default function Hero({ onContinue }: Props) {
         <div className="stake-field">
           <div className="stake-field-label">
             <label htmlFor="hero-amount">Amount</label>
-            <span>CREX</span>
+            <span>TOKEN</span>
           </div>
           <div className="amount-input-wrap">
             <input
@@ -113,7 +113,7 @@ export default function Hero({ onContinue }: Props) {
               step="0.0001"
               value={amount}
               onChange={(event) => setAmount(event.target.value)}
-              aria-label="Amount in ERC-20 CREX"
+              aria-label="Amount in testnet ERC-20 token"
             />
             <button
               type="button"
@@ -178,7 +178,7 @@ export default function Hero({ onContinue }: Props) {
         <p className="stake-disclaimer">
           {settings.stakingPaused
             ? "New positions are temporarily unavailable."
-            : `Minimum ${settings.minDepositSol} CREX · Maximum ${settings.maxDepositSol} CREX`}
+            : `Minimum ${settings.minDepositSol} token · Maximum ${settings.maxDepositSol} token`}
         </p>
       </div>
     </section>

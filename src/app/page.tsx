@@ -27,7 +27,7 @@ export default function Home() {
     try {
       const amt = Number(amount);
       if (!amt || amt <= 0) {
-        alert("Please enter a valid CREX amount.");
+        alert("Please enter a valid staking token amount.");
         return;
       }
       if (!plan) {
