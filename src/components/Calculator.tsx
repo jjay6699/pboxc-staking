@@ -22,7 +22,7 @@ export default function Calculator() {
       <div className="calculator-inputs">
         <div className="calculator-field">
           <label htmlFor="calculator-amount">Amount to stake</label>
-          <span className="field-suffix">SOL</span>
+          <span className="field-suffix">CREX</span>
           <input
             id="calculator-amount"
             type="number"

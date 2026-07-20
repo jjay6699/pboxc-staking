@@ -71,7 +71,7 @@ export default function StakeModal({ open, plan, initialAmount, onClose, onStake
         <div className="stake-modal-header">
           <div>
             <p>REVIEW POSITION</p>
-            <h2 id="stake-modal-title">Stake SOL</h2>
+            <h2 id="stake-modal-title">Stake CREX</h2>
           </div>
           <button type="button" className="stake-modal-close" onClick={onClose} disabled={submitting} aria-label="Close">
             <X size={19} />
@@ -93,7 +93,7 @@ export default function StakeModal({ open, plan, initialAmount, onClose, onStake
         <div className="stake-modal-field">
           <div className="stake-modal-label">
             <label htmlFor="stake-modal-amount">Amount to stake</label>
-            <span>SOL</span>
+            <span>CREX</span>
           </div>
           <input
             id="stake-modal-amount"
@@ -106,7 +106,7 @@ export default function StakeModal({ open, plan, initialAmount, onClose, onStake
             autoFocus
           />
           <p className="stake-modal-limit">
-            Allowed range: {settings.minDepositSol}–{settings.maxDepositSol} SOL
+            Allowed range: {settings.minDepositSol}–{settings.maxDepositSol} CREX
           </p>
         </div>
 
@@ -142,13 +142,13 @@ export default function StakeModal({ open, plan, initialAmount, onClose, onStake
           {settings.stakingPaused
             ? "Staking temporarily paused"
             : submitting
-              ? "Waiting for Phantom…"
-              : "Continue in Phantom"}
+              ? "Waiting for wallet…"
+              : "Continue in wallet"}
           {!submitting && <ArrowRight size={18} />}
         </button>
 
         <p className="stake-modal-note">
-          Phantom will show the final recipient, amount, and network before you approve the transaction.
+          Your wallet will show the final recipient, amount, and network before you approve the transaction.
         </p>
       </div>
     </div>

@@ -29,7 +29,7 @@ export default function Dashboard({ wallet, refreshKey = 0 }: { wallet: string |
       <div>
         <span className="portfolio-status">NO WALLET CONNECTED</span>
         <h3>Your staking positions will appear here.</h3>
-        <p>Connect Phantom from the header to view active stakes, accrued rewards, and maturity dates.</p>
+        <p>Connect Wallet from the header to view active stakes, accrued rewards, and maturity dates.</p>
       </div>
       <a href="#stake">Go to staking</a>
     </div>
@@ -74,7 +74,7 @@ export default function Dashboard({ wallet, refreshKey = 0 }: { wallet: string |
             <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="rounded-xl bg-white/[0.04] border border-white/[0.08] p-3">
                 <div className="text-xs text-white/60">Amount</div>
-                <div className="text-lg font-semibold">{p.amount_sol} SOL</div>
+                <div className="text-lg font-semibold">{p.amount_sol} CREX</div>
               </div>
               <div className="rounded-xl bg-white/[0.04] border border-white/[0.08] p-3">
                 <div className="text-xs text-white/60">Accrued</div>

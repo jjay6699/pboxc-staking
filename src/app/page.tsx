@@ -27,7 +27,7 @@ export default function Home() {
     try {
       const amt = Number(amount);
       if (!amt || amt <= 0) {
-        alert("Please enter a valid SOL amount.");
+        alert("Please enter a valid CREX amount.");
         return;
       }
       if (!plan) {
@@ -39,7 +39,7 @@ export default function Home() {
       }
       const p = (provider ?? (window as any).solana);
       if (!p) {
-        alert("Phantom is not available.");
+        alert("Wallet is not available.");
         return;
       }
       const activeCluster = cluster ?? DEFAULT_CLUSTER;
@@ -63,7 +63,7 @@ export default function Home() {
     } catch (e: any) {
       if (/User rejected/i.test(e?.message)) return; // silent cancel
       console.error("Stake error", e);
-      alert(e?.message || "Failed to open Phantom");
+      alert(e?.message || "Failed to open wallet");
     }
   };
 

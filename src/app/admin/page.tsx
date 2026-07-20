@@ -151,7 +151,7 @@ export default function AdminPage() {
 
         {stats && (
           <section className="admin-stats">
-            <div><span>Total value locked</span><strong>{stats.tvl.toLocaleString()} SOL</strong></div>
+            <div><span>Total value locked</span><strong>{stats.tvl.toLocaleString()} CREX</strong></div>
             <div><span>Total stakers</span><strong>{stats.totalStakers.toLocaleString()}</strong></div>
             <div><span>CREX distributed</span><strong>{stats.totalDistributed.toLocaleString()}</strong></div>
           </section>
@@ -167,9 +167,9 @@ export default function AdminPage() {
               <ShieldCheck size={21} />
             </div>
             <div className="admin-grid-three">
-              <label>Minimum deposit (SOL)<input type="number" min="0.000001" step="0.000001" value={settings.minDepositSol} onChange={(event) => setNumber("minDepositSol", event.target.value)} /></label>
-              <label>Maximum deposit (SOL)<input type="number" min="0.000001" step="0.000001" value={settings.maxDepositSol} onChange={(event) => setNumber("maxDepositSol", event.target.value)} /></label>
-              <label>Base CREX / SOL / day<input type="number" min="0.000001" step="0.01" value={settings.baseRate} onChange={(event) => setNumber("baseRate", event.target.value)} /></label>
+              <label>Minimum stake (CREX)<input type="number" min="0.000001" step="0.000001" value={settings.minDepositSol} onChange={(event) => setNumber("minDepositSol", event.target.value)} /></label>
+              <label>Maximum stake (CREX)<input type="number" min="0.000001" step="0.000001" value={settings.maxDepositSol} onChange={(event) => setNumber("maxDepositSol", event.target.value)} /></label>
+              <label>Base CREX / ERC-20 CREX / day<input type="number" min="0.000001" step="0.01" value={settings.baseRate} onChange={(event) => setNumber("baseRate", event.target.value)} /></label>
             </div>
             <label className="admin-toggle">
               <input type="checkbox" checked={settings.stakingPaused} onChange={(event) => setSettings((current) => ({ ...current, stakingPaused: event.target.checked }))} />

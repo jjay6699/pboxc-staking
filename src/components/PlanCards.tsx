@@ -26,7 +26,7 @@ export default function PlanCards({ onSelect }: { onSelect: (plan: LockPlan) => 
           <div className="plan-multiplier">{multiplier.toFixed(2)}× <span>multiplier</span></div>
           <div className="plan-divider" />
           <div className="plan-return">
-            <span>Daily return per 1 SOL</span>
+            <span>Daily return per 1 ERC-20 CREX</span>
             <strong>{(settings.baseRate * multiplier).toFixed(0)} CREX</strong>
           </div>
           <div className="plan-action">Select plan <span>→</span></div>

@@ -17,7 +17,7 @@ type Props = {
 export default function Hero({ onContinue }: Props) {
   const [amount, setAmount] = useState("1");
   const [plan, setPlan] = useState<LockPlan>("3m");
-  const { provider, address, connecting, connect, networkLabel, balanceSol } = usePhantom();
+  const { provider, address, connecting, connect, balanceSol } = usePhantom();
   const settings = useStakingSettings();
 
   const numericAmount = Math.max(0, Number(amount) || 0);
@@ -34,7 +34,7 @@ export default function Hero({ onContinue }: Props) {
       ? "Connecting…"
       : provider
         ? "Connect wallet to continue"
-        : "Install Phantom to continue";
+        : "Connect Wallet to continue";
 
   const onPrimary = async () => {
     if (!address) {
@@ -51,9 +51,9 @@ export default function Hero({ onContinue }: Props) {
   return (
     <section id="stake" className="hero-shell">
       <div className="hero-copy">
-        <div className="eyebrow">CREX STAKING ON SOLANA</div>
+        <div className="eyebrow">CREX STAKING ON CREX CHAIN</div>
         <h1 className="hero-title">
-          Put your SOL to work.
+          Put your CREX to work.
           <span>Earn CREX daily.</span>
         </h1>
         <p className="hero-description">
@@ -73,17 +73,17 @@ export default function Hero({ onContinue }: Props) {
         <div className="hero-assurances">
           <div>
             <ShieldCheck size={17} />
-            <span>Phantom secured</span>
+            <span>EVM wallet secured</span>
           </div>
           <span className="assurance-divider" />
           <div>
             <span className="network-dot" />
-            <span>Solana {networkLabel}</span>
+            <span>CREX Chain Testnet</span>
           </div>
           <span className="assurance-divider" />
           <div>
             <span className="assurance-value">{settings.baseRate.toLocaleString()}</span>
-            <span>CREX / SOL / day</span>
+            <span>CREX / ERC-20 CREX / day</span>
           </div>
         </div>
       </div>
@@ -92,7 +92,7 @@ export default function Hero({ onContinue }: Props) {
         <div className="stake-card-header">
           <div>
             <p className="stake-card-kicker">NEW POSITION</p>
-            <h2>Stake SOL</h2>
+            <h2>Stake CREX</h2>
           </div>
           <div className="stake-rate">
             <span>Base rate</span>
@@ -103,7 +103,7 @@ export default function Hero({ onContinue }: Props) {
         <div className="stake-field">
           <div className="stake-field-label">
             <label htmlFor="hero-amount">Amount</label>
-            <span>SOL</span>
+            <span>CREX</span>
           </div>
           <div className="amount-input-wrap">
             <input
@@ -113,7 +113,7 @@ export default function Hero({ onContinue }: Props) {
               step="0.0001"
               value={amount}
               onChange={(event) => setAmount(event.target.value)}
-              aria-label="Amount in SOL"
+              aria-label="Amount in ERC-20 CREX"
             />
             <button
               type="button"
@@ -178,7 +178,7 @@ export default function Hero({ onContinue }: Props) {
         <p className="stake-disclaimer">
           {settings.stakingPaused
             ? "New positions are temporarily unavailable."
-            : `Minimum ${settings.minDepositSol} SOL · Maximum ${settings.maxDepositSol} SOL`}
+            : `Minimum ${settings.minDepositSol} CREX · Maximum ${settings.maxDepositSol} CREX`}
         </p>
       </div>
     </section>

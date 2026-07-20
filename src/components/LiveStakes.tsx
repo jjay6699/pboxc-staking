@@ -95,7 +95,7 @@ export default function LiveStakes() {
           items.map((item) => (
             <div className="live-stake-row" key={item.id}>
               <span className="live-wallet">{item.wallet}</span>
-              <strong>{item.amountSol.toLocaleString()} <small>SOL</small></strong>
+              <strong>{item.amountSol.toLocaleString()} <small>CREX</small></strong>
               <span>{item.plan}</span>
               <span>{item.multiplier.toFixed(2)}×</span>
               <span>{relativeTime(item.startedAt)}</span>

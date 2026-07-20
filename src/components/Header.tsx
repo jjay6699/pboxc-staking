@@ -15,7 +15,7 @@ export default function Header() {
       ? "Connecting…"
       : provider
         ? "Connect Wallet"
-        : "Install Phantom";
+        : "Connect Wallet";
 
   return (
     <header className="sticky top-0 z-40 border-b border-white/[0.08] bg-[#080808]/88 backdrop-blur-xl">
@@ -38,7 +38,7 @@ export default function Header() {
           <div className="hidden sm:flex items-center gap-3">
             <div className="network-pill">
               <span className="network-dot" />
-              Solana {networkLabel}
+              CREX Chain Testnet
             </div>
             <button
               onClick={connect}

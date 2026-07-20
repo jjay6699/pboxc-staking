@@ -30,7 +30,7 @@ export default function GlobalStats({ refreshKey = 0 }: Props) {
       </div>
       <div className="stat-item">
         <span>Total value locked</span>
-        <strong>{stats ? format(stats.tvl) : "—"} <small>SOL</small></strong>
+        <strong>{stats ? format(stats.tvl) : "—"} <small>CREX</small></strong>
       </div>
       <div className="stat-item">
         <span>Total stakers</span>

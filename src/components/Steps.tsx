@@ -2,9 +2,9 @@
 
 export default function Steps() {
   const steps = [
-    { title: "Connect wallet", desc: "Link your Phantom wallet" },
+    { title: "Connect wallet", desc: "Connect your EVM wallet" },
     { title: "Choose a plan", desc: "Select amount and duration" },
-    { title: "Confirm stake", desc: "Approve the SOL transaction" },
+    { title: "Confirm stake", desc: "Approve the CREX transaction" },
     { title: "Claim rewards", desc: "Collect CREX at maturity" },
   ];
 

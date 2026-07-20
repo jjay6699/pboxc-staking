@@ -26,7 +26,7 @@ export default function WalletPanel() {
 
 	const onPrimary = () => {
 		if (!provider) {
-			window.open("https://phantom.app/", "_blank");
+			window.open("https://wallet.app/", "_blank");
 			return;
 		}
 		if (isConnected) disconnect();
@@ -47,9 +47,9 @@ export default function WalletPanel() {
 						disabled={connecting}
 						className="rounded-xl bg-white text-black px-4 py-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
 					>
-						{connecting ? "Processing..." : !provider ? "Install Phantom" : isConnected ? "Disconnect" : "Connect Phantom"}
+						{connecting ? "Processing..." : !provider ? "Connect Wallet" : isConnected ? "Disconnect" : "Connect Wallet"}
 					</button>
-					<div className="text-[11px] text-white/40 mt-1">Phantom only</div>
+					<div className="text-[11px] text-white/40 mt-1">EVM wallet</div>
 					{lastError && <div className="text-[11px] text-red-400 mt-1">{lastError}</div>}
 				</div>
 			</div>
@@ -83,7 +83,7 @@ export default function WalletPanel() {
 						<div className="text-xs text-white/60">Balance</div>
 						<div className="mt-1 text-3xl font-semibold">
 							{typeof balanceSol === "number" ? balanceSol.toFixed(4) : "—"}
-							<span className="text-white/60 text-sm ml-1 align-middle">SOL</span>
+							<span className="text-white/60 text-sm ml-1 align-middle">CREX</span>
 						</div>
 					</div>
 				</div>
