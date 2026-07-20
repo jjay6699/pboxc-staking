@@ -20,10 +20,10 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-white/[0.08] bg-[#080808]/88 backdrop-blur-xl">
       <div className="px-6 sm:px-8">
-        <div className="max-w-[1200px] mx-auto h-[72px] flex items-center justify-between">
+        <div className="max-w-[1200px] mx-auto h-[84px] flex items-center justify-between">
           <div className="flex items-center gap-10">
             <a href="#" className="flex items-center" aria-label="CREX home">
-              <Image src="/logo-header.png" width={150} height={30} alt="CREX" priority />
+              <Image src="/logo-header.png" width={64} height={64} alt="CREX" priority className="site-logo" />
             </a>
 
             <nav className="hidden lg:flex items-center gap-1 text-sm">

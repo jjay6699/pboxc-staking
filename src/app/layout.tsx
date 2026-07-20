@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     siteName: "CREX Staking",
     title: "CREX Staking",
     description: "Stake SOL into time-locked plans to earn daily CREX rewards.",
-    images: [{ url: "/logo-header.png", width: 1200, height: 630, alt: "CREX" }],
+    images: [{ url: "/logo-header.png", width: 512, height: 512, alt: "CREX" }],
   },
   twitter: {
     card: "summary_large_image",
@@ -67,7 +67,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <div className="max-w-[1200px] mx-auto">
               <div className="footer-main">
                 <div className="footer-brand">
-                  <Image src="/logo-header.png" width={150} height={30} alt="CREX" />
+                  <Image src="/logo-header.png" width={72} height={72} alt="CREX" className="site-logo footer-logo" />
                   <p>Fixed-term SOL staking with transparent, predictable CREX rewards.</p>
                 </div>
                 <div className="footer-links">
