@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { sql } from "@vercel/postgres";
 import { LOCK_MULTIPLIERS, LockPlan } from "@/lib/config";
-import { getAccruedPboxc, getDaysElapsed, getMaturityTs, isClaimable } from "@/lib/rewards";
+import { getAccruedCrex, getDaysElapsed, getMaturityTs, isClaimable } from "@/lib/rewards";
 import type { DerivedPosition, Position, TxRecord } from "@/types";
 import {
   DEFAULT_STAKING_SETTINGS,
@@ -166,7 +166,7 @@ function createPostgresDb(): DbApi {
       return res.rows.map(mapPositionRow).map(p => ({
         ...p,
         days_elapsed: getDaysElapsed(p.start_ts, p.lock_plan, now),
-        accrued_pboxc: getAccruedPboxc(
+        accrued_pboxc: getAccruedCrex(
           p.amount_sol,
           p.lock_plan,
           p.start_ts,
@@ -366,7 +366,7 @@ function createFileDb(): DbApi {
         .map(p => ({
           ...p,
           days_elapsed: getDaysElapsed(p.start_ts, p.lock_plan, now),
-          accrued_pboxc: getAccruedPboxc(
+          accrued_pboxc: getAccruedCrex(
             p.amount_sol,
             p.lock_plan,
             p.start_ts,

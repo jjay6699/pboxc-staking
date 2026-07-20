@@ -62,11 +62,11 @@ export async function fetchSolanaBalanceLamports(address: string, cluster: strin
         return result;
       }
       zeroResult = result;
-      console.warn("[PBOXC] RPC returned 0 lamports, trying next candidate", candidate.endpoint);
+      console.warn("[CREX] RPC returned 0 lamports, trying next candidate", candidate.endpoint);
       continue;
     } catch (err) {
       lastError = err;
-      console.warn(`[PBOXC] RPC balance failed (${candidate.source})`, candidate.endpoint, err);
+      console.warn(`[CREX] RPC balance failed (${candidate.source})`, candidate.endpoint, err);
       continue;
     }
   }
@@ -124,7 +124,7 @@ export function getRpcCandidates(cluster: string | null | undefined): RpcCandida
 async function queryLamports(endpoint: string, address: string): Promise<number> {
   const body = JSON.stringify({
     jsonrpc: "2.0",
-    id: `pboxc-server-balance-${address}`,
+    id: `crex-server-balance-${address}`,
     method: "getBalance",
     params: [address, { commitment: "processed" }],
   });
@@ -189,7 +189,7 @@ export async function fetchLatestBlockhash(cluster: string | null | undefined): 
       };
     } catch (err) {
       lastError = err;
-      console.warn("[PBOXC] blockhash fetch failed", candidate.endpoint, err);
+      console.warn("[CREX] blockhash fetch failed", candidate.endpoint, err);
       continue;
     }
   }
@@ -210,7 +210,7 @@ export async function sendRawTransactionBase64(signedTxn: string, cluster: strin
       return { signature, endpoint: candidate.endpoint, cluster: candidate.cluster };
     } catch (err) {
       lastError = err;
-      console.warn("[PBOXC] sendRawTransaction failed", candidate.endpoint, err);
+      console.warn("[CREX] sendRawTransaction failed", candidate.endpoint, err);
       continue;
     }
   }

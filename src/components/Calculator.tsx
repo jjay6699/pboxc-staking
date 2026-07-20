@@ -55,7 +55,7 @@ export default function Calculator() {
       <div className="calculator-results">
         <div>
           <span>Daily reward</span>
-          <strong>{Math.floor(daily).toLocaleString()} <small>PBOXC</small></strong>
+          <strong>{Math.floor(daily).toLocaleString()} <small>CREX</small></strong>
         </div>
         <div>
           <span>Lock duration</span>
@@ -63,7 +63,7 @@ export default function Calculator() {
         </div>
         <div className="calculator-total">
           <span>Projected total</span>
-          <strong>{Math.floor(total).toLocaleString()} <small>PBOXC</small></strong>
+          <strong>{Math.floor(total).toLocaleString()} <small>CREX</small></strong>
         </div>
       </div>
     </div>

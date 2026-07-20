@@ -111,7 +111,7 @@ export default function AdminPage() {
       <main className="admin-shell">
         <div className="admin-login">
           <div className="admin-login-mark"><LockKeyhole size={24} /></div>
-          <p className="section-kicker">PERABOX CONTROL</p>
+          <p className="section-kicker">CONNECT REDEFINE EXCHANGE CONTROL</p>
           <h1>Admin login</h1>
           <p>Manage staking limits, reward rates, multipliers, and platform availability.</p>
           {!configured && (
@@ -142,7 +142,7 @@ export default function AdminPage() {
       <div className="admin-dashboard">
         <header className="admin-header">
           <div>
-            <p className="section-kicker">PERABOX CONTROL</p>
+            <p className="section-kicker">CONNECT REDEFINE EXCHANGE CONTROL</p>
             <h1>Staking administration</h1>
             <p>Changes are saved to the connected platform database and enforced by the API.</p>
           </div>
@@ -153,7 +153,7 @@ export default function AdminPage() {
           <section className="admin-stats">
             <div><span>Total value locked</span><strong>{stats.tvl.toLocaleString()} SOL</strong></div>
             <div><span>Total stakers</span><strong>{stats.totalStakers.toLocaleString()}</strong></div>
-            <div><span>PBOXC distributed</span><strong>{stats.totalDistributed.toLocaleString()}</strong></div>
+            <div><span>CREX distributed</span><strong>{stats.totalDistributed.toLocaleString()}</strong></div>
           </section>
         )}
 
@@ -169,7 +169,7 @@ export default function AdminPage() {
             <div className="admin-grid-three">
               <label>Minimum deposit (SOL)<input type="number" min="0.000001" step="0.000001" value={settings.minDepositSol} onChange={(event) => setNumber("minDepositSol", event.target.value)} /></label>
               <label>Maximum deposit (SOL)<input type="number" min="0.000001" step="0.000001" value={settings.maxDepositSol} onChange={(event) => setNumber("maxDepositSol", event.target.value)} /></label>
-              <label>Base PBOXC / SOL / day<input type="number" min="0.000001" step="0.01" value={settings.baseRate} onChange={(event) => setNumber("baseRate", event.target.value)} /></label>
+              <label>Base CREX / SOL / day<input type="number" min="0.000001" step="0.01" value={settings.baseRate} onChange={(event) => setNumber("baseRate", event.target.value)} /></label>
             </div>
             <label className="admin-toggle">
               <input type="checkbox" checked={settings.stakingPaused} onChange={(event) => setSettings((current) => ({ ...current, stakingPaused: event.target.checked }))} />

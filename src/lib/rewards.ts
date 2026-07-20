@@ -11,7 +11,7 @@ export function getDaysElapsed(startTs: number, plan: LockPlan, nowTs?: number):
 	return Math.max(0, Math.min(maxDays, Math.floor(elapsed / 86400)));
 }
 
-export function getAccruedPboxc(
+export function getAccruedCrex(
 	amountSol: number,
 	plan: LockPlan,
 	startTs: number,

@@ -70,7 +70,7 @@ export function usePhantom() {
         setRpcEndpoint(endpoint);
         const normalized = clusterFromEndpoint(endpoint) ?? normalizeClusterKey(DEFAULT_CLUSTER);
         setCluster(normalized);
-        console.log("[PBOXC] detected cluster from endpoint", normalized, endpoint);
+        console.log("[CREX] detected cluster from endpoint", normalized, endpoint);
       }
       if (p?.publicKey) setAddress(p.publicKey.toString());
       p?.on?.("connect", (pk: any) => {
@@ -87,7 +87,7 @@ export function usePhantom() {
       p?.on?.("networkChanged", (next: any) => {
         const normalized = typeof next === "string" ? clusterFromEndpoint(next) ?? genesisToCluster(next) ?? normalizeClusterKey(next) : null;
         if (normalized) {
-          console.log("[PBOXC] networkChanged", normalized, next);
+          console.log("[CREX] networkChanged", normalized, next);
           setCluster(normalized);
         }
         if (typeof next === "string" && isHttpEndpoint(next)) {
@@ -113,10 +113,10 @@ export function usePhantom() {
           const normalized = genesisToCluster(genesis) ?? DEFAULT_CLUSTER;
           const finalCluster = normalizeClusterKey(normalized);
           setCluster(finalCluster);
-          console.log("[PBOXC] detected cluster from genesis", finalCluster);
+          console.log("[CREX] detected cluster from genesis", finalCluster);
         }
       } catch (err) {
-        console.warn("[PBOXC] getGenesisHash failed, keeping default cluster", err);
+        console.warn("[CREX] getGenesisHash failed, keeping default cluster", err);
       }
     }
     detectCluster();
@@ -129,7 +129,7 @@ export function usePhantom() {
     async function load() {
       if (!address) { setBalanceSol(null); return; }
       const providerLamports = await requestBalanceFromProvider(provider, address).catch(err => {
-        console.warn("[PBOXC] provider.getBalance failed, falling back to API", err);
+        console.warn("[CREX] provider.getBalance failed, falling back to API", err);
         return null;
       });
       if (providerLamports != null) {
@@ -155,7 +155,7 @@ export function usePhantom() {
         }
         return;
       } catch (err) {
-        console.error("[PBOXC] balance API fetch failed", err);
+        console.error("[CREX] balance API fetch failed", err);
       }
 
       if (!cancelled) setBalanceSol(null);

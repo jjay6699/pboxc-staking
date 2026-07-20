@@ -1,7 +1,7 @@
 import { createHmac, timingSafeEqual } from "crypto";
 import type { NextRequest } from "next/server";
 
-export const ADMIN_COOKIE_NAME = "pboxc_admin_session";
+export const ADMIN_COOKIE_NAME = "crex_admin_session";
 const SESSION_SECONDS = 8 * 60 * 60;
 
 type SessionPayload = {

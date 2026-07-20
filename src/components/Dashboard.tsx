@@ -45,7 +45,7 @@ export default function Dashboard({ wallet, refreshKey = 0 }: { wallet: string |
           <div>
             <span className="portfolio-status">PORTFOLIO READY</span>
             <h3>No active positions yet.</h3>
-            <p>Choose a staking plan to create your first PBOXC reward position.</p>
+            <p>Choose a staking plan to create your first CREX reward position.</p>
           </div>
           <a href="#plans">Choose a plan</a>
         </div>
@@ -59,7 +59,7 @@ export default function Dashboard({ wallet, refreshKey = 0 }: { wallet: string |
         const hh = Math.floor((remain % 86400) / 3600);
         const mm = Math.floor((remain % 3600) / 60);
         const claimDisabled = !p.claimable;
-        const dailyPboxc = Math.floor(p.amount_sol * settings.baseRate * p.lock_multiplier);
+        const dailyCrex = Math.floor(p.amount_sol * settings.baseRate * p.lock_multiplier);
 
         return (
           <div key={p.id} className="rounded-2xl bg-white/[0.03] border border-white/[0.08] p-4 card-neo">
@@ -78,8 +78,8 @@ export default function Dashboard({ wallet, refreshKey = 0 }: { wallet: string |
               </div>
               <div className="rounded-xl bg-white/[0.04] border border-white/[0.08] p-3">
                 <div className="text-xs text-white/60">Accrued</div>
-                <div className="text-lg font-semibold">{fmt(Math.floor(p.accrued_pboxc))} PBOXC</div>
-                <div className="text-[11px] text-white/50 mt-1">Daily ~ {fmt(dailyPboxc)} PBOXC</div>
+                <div className="text-lg font-semibold">{fmt(Math.floor(p.accrued_pboxc))} CREX</div>
+                <div className="text-[11px] text-white/50 mt-1">Daily ~ {fmt(dailyCrex)} CREX</div>
               </div>
               <div className="flex items-center justify-end">
                 <button

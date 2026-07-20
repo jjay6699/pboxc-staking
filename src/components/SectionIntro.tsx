@@ -2,7 +2,7 @@ export default function SectionIntro({ title, subtitle, className }: { title: st
   return (
     <div className={`section-heading ${className ?? ""}`}>
       <div>
-        <p className="section-kicker">PBOXC STAKING</p>
+        <p className="section-kicker">CREX STAKING</p>
         <h2>{title}</h2>
       </div>
       {subtitle ? <p>{subtitle}</p> : null}

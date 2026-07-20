@@ -51,10 +51,10 @@ export default function Hero({ onContinue }: Props) {
   return (
     <section id="stake" className="hero-shell">
       <div className="hero-copy">
-        <div className="eyebrow">PBOXC STAKING ON SOLANA</div>
+        <div className="eyebrow">CREX STAKING ON SOLANA</div>
         <h1 className="hero-title">
           Put your SOL to work.
-          <span>Earn PBOXC daily.</span>
+          <span>Earn CREX daily.</span>
         </h1>
         <p className="hero-description">
           Choose a fixed staking period and earn a predictable daily reward.
@@ -83,7 +83,7 @@ export default function Hero({ onContinue }: Props) {
           <span className="assurance-divider" />
           <div>
             <span className="assurance-value">{settings.baseRate.toLocaleString()}</span>
-            <span>PBOXC / SOL / day</span>
+            <span>CREX / SOL / day</span>
           </div>
         </div>
       </div>
@@ -96,7 +96,7 @@ export default function Hero({ onContinue }: Props) {
           </div>
           <div className="stake-rate">
             <span>Base rate</span>
-            <strong>{settings.baseRate.toLocaleString()} PBOXC/day</strong>
+            <strong>{settings.baseRate.toLocaleString()} CREX/day</strong>
           </div>
         </div>
 
@@ -148,7 +148,7 @@ export default function Hero({ onContinue }: Props) {
         <div className="reward-preview">
           <div>
             <span>Estimated reward</span>
-            <strong>{Math.floor(total).toLocaleString()} PBOXC</strong>
+            <strong>{Math.floor(total).toLocaleString()} CREX</strong>
           </div>
           <div>
             <span>Duration</span>
@@ -156,7 +156,7 @@ export default function Hero({ onContinue }: Props) {
           </div>
           <div>
             <span>Daily reward</span>
-            <strong>{Math.floor(numericAmount * settings.baseRate * multiplier).toLocaleString()} PBOXC</strong>
+            <strong>{Math.floor(numericAmount * settings.baseRate * multiplier).toLocaleString()} CREX</strong>
           </div>
         </div>
 

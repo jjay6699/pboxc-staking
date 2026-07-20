@@ -27,7 +27,7 @@ export default function PlanCards({ onSelect }: { onSelect: (plan: LockPlan) => 
           <div className="plan-divider" />
           <div className="plan-return">
             <span>Daily return per 1 SOL</span>
-            <strong>{(settings.baseRate * multiplier).toFixed(0)} PBOXC</strong>
+            <strong>{(settings.baseRate * multiplier).toFixed(0)} CREX</strong>
           </div>
           <div className="plan-action">Select plan <span>→</span></div>
         </button>

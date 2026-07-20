@@ -15,30 +15,30 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://pboxc-staking.vercel.app"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://crex-staking.vercel.app"),
   title: {
-    default: "PBOXC Staking",
-    template: "%s | PBOXC Staking",
+    default: "CREX Staking",
+    template: "%s | CREX Staking",
   },
-  description: "Stake SOL into time-locked plans to earn daily PBOXC rewards.",
-  keywords: ["PBOXC", "staking", "Solana", "SOL", "Phantom", "crypto", "web3", "DeFi"],
-  applicationName: "PBOXC Staking",
-  authors: [{ name: "PBOXC" }],
-  creator: "PBOXC",
-  publisher: "PBOXC",
+  description: "Stake SOL into time-locked plans to earn daily CREX rewards.",
+  keywords: ["CREX", "staking", "Solana", "SOL", "Phantom", "crypto", "web3", "DeFi"],
+  applicationName: "CREX Staking",
+  authors: [{ name: "CREX" }],
+  creator: "CREX",
+  publisher: "CREX",
   robots: { index: true, follow: true },
   openGraph: {
     type: "website",
     url: "/",
-    siteName: "PBOXC Staking",
-    title: "PBOXC Staking",
-    description: "Stake SOL into time-locked plans to earn daily PBOXC rewards.",
-    images: [{ url: "/logo-header.png", width: 1200, height: 630, alt: "PBOXC" }],
+    siteName: "CREX Staking",
+    title: "CREX Staking",
+    description: "Stake SOL into time-locked plans to earn daily CREX rewards.",
+    images: [{ url: "/logo-header.png", width: 1200, height: 630, alt: "CREX" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "PBOXC Staking",
-    description: "Stake SOL into time-locked plans to earn daily PBOXC rewards.",
+    title: "CREX Staking",
+    description: "Stake SOL into time-locked plans to earn daily CREX rewards.",
     images: ["/logo-header.png"],
   },
   icons: {
@@ -67,8 +67,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <div className="max-w-[1200px] mx-auto">
               <div className="footer-main">
                 <div className="footer-brand">
-                  <Image src="/logo-header.png" width={150} height={30} alt="Erabox" />
-                  <p>Fixed-term SOL staking with transparent, predictable PBOXC rewards.</p>
+                  <Image src="/logo-header.png" width={150} height={30} alt="CREX" />
+                  <p>Fixed-term SOL staking with transparent, predictable CREX rewards.</p>
                 </div>
                 <div className="footer-links">
                   <div>
@@ -87,8 +87,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 </div>
               </div>
               <div className="footer-bottom">
-                <span>© 2026 Erabox. All rights reserved.</span>
-                <span>Built on Solana · PBOXC staking</span>
+                <span>© 2026 Connect Redefine Exchange. All rights reserved.</span>
+                <span>Built on Solana · CREX staking</span>
               </div>
             </div>
           </footer>

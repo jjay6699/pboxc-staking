@@ -37,8 +37,8 @@ export default function GlobalStats({ refreshKey = 0 }: Props) {
         <strong>{stats ? format(stats.totalStakers) : "—"}</strong>
       </div>
       <div className="stat-item">
-        <span>PBOXC distributed</span>
-        <strong>{stats ? format(stats.totalDistributed) : "—"} <small>PBOXC</small></strong>
+        <span>CREX distributed</span>
+        <strong>{stats ? format(stats.totalDistributed) : "—"} <small>CREX</small></strong>
       </div>
     </div>
   );

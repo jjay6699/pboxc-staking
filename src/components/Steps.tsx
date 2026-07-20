@@ -5,7 +5,7 @@ export default function Steps() {
     { title: "Connect wallet", desc: "Link your Phantom wallet" },
     { title: "Choose a plan", desc: "Select amount and duration" },
     { title: "Confirm stake", desc: "Approve the SOL transaction" },
-    { title: "Claim rewards", desc: "Collect PBOXC at maturity" },
+    { title: "Claim rewards", desc: "Collect CREX at maturity" },
   ];
 
   return (

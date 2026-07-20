@@ -113,7 +113,7 @@ export default function StakeModal({ open, plan, initialAmount, onClose, onStake
         <div className="stake-modal-summary">
           <div>
             <span>Daily reward</span>
-            <strong>{Math.floor(dailyReward).toLocaleString()} PBOXC</strong>
+            <strong>{Math.floor(dailyReward).toLocaleString()} CREX</strong>
           </div>
           <div>
             <span>Lock duration</span>
@@ -121,7 +121,7 @@ export default function StakeModal({ open, plan, initialAmount, onClose, onStake
           </div>
           <div>
             <span>Projected total</span>
-            <strong>{Math.floor(totalReward).toLocaleString()} PBOXC</strong>
+            <strong>{Math.floor(totalReward).toLocaleString()} CREX</strong>
           </div>
         </div>
 

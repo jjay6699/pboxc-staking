@@ -23,13 +23,13 @@ export function getPhantom(): PhantomProvider | null {
   const nested = anyWindow?.phantom?.solana;
   const prov = direct?.isPhantom ? direct : nested?.isPhantom ? nested : null;
   if (typeof window !== "undefined") {
-    (window as any).__PBOXC_DEBUG__ = {
+    (window as any).__CREX_DEBUG__ = {
       solana: !!direct,
       phantom_solana: !!nested,
       isPhantom: !!prov?.isPhantom,
       hasPublicKey: !!prov?.publicKey,
     };
-    console.log("[PBOXC] getPhantom", (window as any).__PBOXC_DEBUG__);
+    console.log("[CREX] getPhantom", (window as any).__CREX_DEBUG__);
   }
   return prov ?? null;
 }
@@ -38,41 +38,41 @@ export function waitForPhantom(timeoutMs = 1500): Promise<PhantomProvider | null
   if (typeof window === "undefined") return Promise.resolve(null);
   const existing = getPhantom();
   if (existing) return Promise.resolve(existing);
-  console.log("[PBOXC] waiting for phantom#initialized event...");
+  console.log("[CREX] waiting for phantom#initialized event...");
   return new Promise(resolve => {
     let done = false;
     const timer = setTimeout(() => {
       if (done) return;
       done = true;
-      console.warn("[PBOXC] phantom not detected within timeout");
+      console.warn("[CREX] phantom not detected within timeout");
       resolve(getPhantom());
     }, timeoutMs);
     window.addEventListener("phantom#initialized", () => {
       if (done) return;
       done = true;
       clearTimeout(timer);
-      console.log("[PBOXC] phantom#initialized received");
+      console.log("[CREX] phantom#initialized received");
       resolve(getPhantom());
     }, { once: true });
   });
 }
 
 export async function safeConnect(provider: PhantomProvider): Promise<string | null> {
-  console.log("[PBOXC] safeConnect: starting", { hasRequest: !!provider.request });
+  console.log("[CREX] safeConnect: starting", { hasRequest: !!provider.request });
   try {
     const res = await provider.connect({ onlyIfTrusted: false });
     const key = res?.publicKey?.toString?.() ?? null;
-    console.log("[PBOXC] connect() resolved", { key });
+    console.log("[CREX] connect() resolved", { key });
     return key;
   } catch (e) {
-    console.warn("[PBOXC] connect() failed, trying request('connect')", e);
+    console.warn("[CREX] connect() failed, trying request('connect')", e);
     try {
       const res = await provider.request?.({ method: "connect" });
       const key = (res?.publicKey ?? provider.publicKey)?.toString?.() ?? null;
-      console.log("[PBOXC] request('connect') resolved", { key });
+      console.log("[CREX] request('connect') resolved", { key });
       return key;
     } catch (e2) {
-      console.error("[PBOXC] request('connect') failed", e2);
+      console.error("[CREX] request('connect') failed", e2);
       return null;
     }
   }
@@ -88,7 +88,7 @@ export function buildPhantomTransferUrl(args: { recipient: string; amountSol?: n
   if (label) qp.set("label", label);
   if (message) qp.set("message", message);
   const url = `https://phantom.app/ul/v1/transfer?${qp.toString()}`;
-  console.log("[PBOXC] transfer link", url);
+  console.log("[CREX] transfer link", url);
   return url;
 }
 
@@ -102,21 +102,21 @@ export async function sendSolViaPhantom(args: { provider: PhantomProvider; recip
   const toPubkey = new PublicKey(recipient);
   const lamports = Math.round(amountSol * 1_000_000_000);
   if (lamports <= 0) throw new Error("Amount must be greater than 0");
-  console.log("[PBOXC] building transfer", { from: fromPubkey.toBase58(), to: toPubkey.toBase58(), lamports });
+  console.log("[CREX] building transfer", { from: fromPubkey.toBase58(), to: toPubkey.toBase58(), lamports });
   const ix = SystemProgram.transfer({ fromPubkey, toPubkey, lamports });
   const bh = await fetchBlockhashFromApi(network);
   const tx = new Transaction({ recentBlockhash: bh.blockhash, feePayer: fromPubkey }).add(ix);
   (tx as any).lastValidBlockHeight = bh.lastValidBlockHeight;
   if (provider.signAndSendTransaction) {
     const { signature } = await provider.signAndSendTransaction(tx, { skipPreflight: false });
-    console.log("[PBOXC] signAndSendTransaction signature", signature, "via", bh.endpoint);
+    console.log("[CREX] signAndSendTransaction signature", signature, "via", bh.endpoint);
     return signature;
   }
   const signed = await provider.signTransaction?.(tx);
   if (!signed) throw new Error("Wallet cannot sign transaction");
   const base64 = toBase64(signed.serialize());
   const signature = await sendRawViaApi(base64, network);
-  console.log("[PBOXC] sendRawTransaction via API signature", signature);
+  console.log("[CREX] sendRawTransaction via API signature", signature);
   return signature;
 }
 

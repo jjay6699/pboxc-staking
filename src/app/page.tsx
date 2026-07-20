@@ -103,7 +103,7 @@ export default function Home() {
       />
 
       <section id="dashboard" className="content-section">
-        <SectionIntro title="Your staking portfolio" subtitle="Monitor active positions, accrued PBOXC, and upcoming maturity dates in one place." />
+        <SectionIntro title="Your staking portfolio" subtitle="Monitor active positions, accrued CREX, and upcoming maturity dates in one place." />
         <Dashboard wallet={address} refreshKey={positionsVersion} />
       </section>
 

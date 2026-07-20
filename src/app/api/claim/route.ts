@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/server/db";
-import { getAccruedPboxc, isClaimable } from "@/lib/rewards";
+import { getAccruedCrex, isClaimable } from "@/lib/rewards";
 
 const BodySchema = z.object({
   id: z.string().min(8),
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
   }
 
   const settings = await db.getSettings();
-  const total = getAccruedPboxc(
+  const total = getAccruedCrex(
     position.amount_sol,
     position.lock_plan,
     position.start_ts,

@@ -22,8 +22,8 @@ export default function Header() {
       <div className="px-6 sm:px-8">
         <div className="max-w-[1200px] mx-auto h-[72px] flex items-center justify-between">
           <div className="flex items-center gap-10">
-            <a href="#" className="flex items-center" aria-label="Erabox home">
-              <Image src="/logo-header.png" width={150} height={30} alt="Erabox" priority />
+            <a href="#" className="flex items-center" aria-label="CREX home">
+              <Image src="/logo-header.png" width={150} height={30} alt="CREX" priority />
             </a>
 
             <nav className="hidden lg:flex items-center gap-1 text-sm">
